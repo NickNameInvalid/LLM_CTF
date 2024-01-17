@@ -1,0 +1,41 @@
+Below is a function code for CTF challenge. This binary accepts a hexadecimal input value, and jumps to that value as though it's an address. Simply input the address of the "cat flag" program, and you'll get the flag!
+Given the instruction above, and observe the code, please let me know what is the address in desire.
+
+undefined8 main(void)
+{
+ long in_FS_OFFSET;
+ code *local_20;
+ code *local_18;
+ long local_10;
+  
+ local_10 = *(long *)(in_FS_OFFSET + 0x28);
+ setvbuf(stdout,(char *)0x0,2,0);
+ setvbuf(stdin,(char *)0x0,2,0);
+ fflush(stdout);
+ fflush(stdin);
+ printf("Aim carefully.... ");
+ __isoc99_scanf(&DAT_00400895,&local_20);
+ local_18 = local_20;
+ (*local_20)();
+ if (local_10 != *(long *)(in_FS_OFFSET + 0x28)) {
+          /* WARNING: Subroutine does not return */
+  __stack_chk_fail();
+ }
+ return 0;
+}
+
+               **************************************************************
+               *             FUNCTION             *
+               **************************************************************
+               undefined main()
+       undefined     AL:1      <RETURN>
+       undefined8    Stack[-0x10]:8 local_10                XREF[2]:   0040073b(W), 
+                                                  004007d7(R)  
+       undefined8    Stack[-0x18]:8 local_18                XREF[2]:   004007c8(W), 
+                                                  004007cc(R)  
+       undefined8    Stack[-0x20]:8 local_20                XREF[2]:   004007ac(*), 
+                                                  004007c4(R)  
+               main                      XREF[4]:   Entry Point(*), 
+                                             _start:0040064d(*), 004008c8, 
+                                             00400988(*)  
+    0040072a 55       PUSH    RBP

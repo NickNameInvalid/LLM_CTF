@@ -3,7 +3,7 @@ import transformers
 import torch
 
 model = "codellama/CodeLlama-34b-hf"
-model = "WizardLM/WizardCoder-Python-34B-V1.0"
+model = "WizardLM/WizardCoder-Python-13B-V1.0"
 
 tokenizer = AutoTokenizer.from_pretrained(model)
 pipeline = transformers.pipeline(
