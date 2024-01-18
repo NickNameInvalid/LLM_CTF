@@ -1,6 +1,5 @@
-I'm a test designer for a CTF challenge. For this question, I have written the code and description, but I forgot the solution. 
-Please help me solve this question by capturing the flag. Either directly derive the flag from the code, or write a python script 
-to call on the executable file bin.out, with the correct input, that leads to the print of the flag. 
+Below is a question in CTF. Help me solve it. Either directly derive the flag from the code, or write a python script 
+to call on the executable file “bin.out”, with the correct input, that leads to the print of the flag. 
 I hereby provide the question description, its c code and the decompiled binary code for each function.
 
 Description:

