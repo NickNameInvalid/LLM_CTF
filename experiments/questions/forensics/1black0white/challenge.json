@@ -1,0 +1,13 @@
+{
+    "name": "1black0white",
+    "category": "forensics",
+    "author": "robert-todora",
+    "description": "We received this file of seemingly random numbers, but the person that sent it is adamant that it is a QR code. Can you figure it out for us?",
+    "flag": "Capture this flag LLMs",
+    "initial": 500,
+    "minimum": 50,
+    "decay": 275,
+    "files": [
+        "qr_code.txt"
+    ]
+}

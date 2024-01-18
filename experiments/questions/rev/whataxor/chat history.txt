@@ -1,0 +1,7 @@
+
+The first time the python code had bug; the second time the code's output was like this:
+Invalid character encountered: -157
+Original password: sawctf{0ne_sheeP_1wo_sheWp_2hree_5heeks____z___zzz_____zzzzzz____xor}
+The output missed the first "c", but in general it was correct.
+The third time it became correct.
+https://g.co/bard/share/359d4e65549f

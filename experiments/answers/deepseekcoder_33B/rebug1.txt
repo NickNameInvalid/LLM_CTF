@@ -1,0 +1,18 @@
+The C code provided is a simple program that takes a string input from the user, checks if the length of the string is 0xC (or 12 in decimal), and if it is, it computes the MD5 hash of a predefined string "csawctf{" and prints it as the flag.
+
+To solve this challenge, you need to input a string of length 12. Here's a Python script that automates the process of inputting the correct string and calling the "test.out" executable:
+
+python
+Copy code
+import subprocess
+
+# The correct input string
+input_string = "csawctf{"
+
+# Call the executable with the correct input
+result = subprocess.run(["./test.out"], input=input_string.encode(), stdout=subprocess.PIPE)
+
+# Print the output
+print(result.stdout.decode())
+
+Make sure to replace "./test.out" with the actual path to your executable file. This script will feed the correct input to the executable and print the output, which should be the flag.

@@ -1,0 +1,152 @@
+Here is the report for rainbow-notes : The docker-compose file provided contains configuration for two services, bot and web, which are likely part of a Capture The Flag (CTF) challenge called "Rainbow Notes". Here's a possible breakdown of steps and clues based on the file's contents:
+
+    Service Analysis:
+        The bot service is built from a Docker context located in the ./bot directory, suggesting that the source code or Dockerfile might contain vulnerabilities or hints.
+        Environment variables like URL_CHECK_REGEX and FLAG indicate that the bot might be interacting with URLs and that the flag to capture is csawctf{5af5c57dd6}.
+
+    Network Configuration:
+        The ports configuration for the bot service maps the container's port 8000 to the host's port 8000, allowing network interaction with the bot.
+        The web service uses the nginx image, serving content from ./web directory on port 80 inside the container, which is mapped to port 8763 on the host.
+
+    Hypothesized Attack Vectors:
+        The bot may be designed to fetch URLs or content from the web service. An SSRF vulnerability could be exploited to make the bot retrieve the flag from a protected location.
+        The regular expression for URL checking (URL_CHECK_REGEX) may be vulnerable to bypasses, allowing an attacker to craft a URL that passes the regex but causes unintended behavior by the bot.
+
+    Solution Approach:
+        Review the ./bot source code for vulnerabilities.
+        Inspect the ./web directory for clues and potential vulnerabilities in the web application.
+        Test the bot's URL-fetching functionality to see if it can be exploited to leak the flag.
+        Attempt to bypass the URL_CHECK_REGEX to explore local files or unintended URLs.
+
+    Flag Capture:
+        Once a vulnerability is found and exploited, the ultimate goal is to make the bot reveal the flag csawctf{5af5c57dd6}.
+
+```Here is the report for rainbow-notes : The docker-compose file provided contains configuration for two services, bot and web, which are likely part of a Capture The Flag (CTF) challenge called "Rainbow Notes". Here's a possible breakdown of steps and clues based on the file's contents:
+
+    Service Analysis:
+        The bot service is built from a Docker context located in the ./bot directory, suggesting that the source code or Dockerfile might contain vulnerabilities or hints.
+        Environment variables like URL_CHECK_REGEX and FLAG indicate that the bot might be interacting with URLs and that the flag to capture is csawctf{5af5c57dd6}.
+
+    Environment Variables and Functionality:
+        The TITLE environment variable suggests a custom admin bot for a service called "Rainbow Notes".
+        PORT is set to 8000, indicating the service is listening on this port.
+        SITE is set to a domain, which might be where the "Rainbow Notes" application is hosted.
+        URL_CHECK_REGEX suggests that there is input validation on URLs, possibly a vector for security testing.
+        The FLAG variable contains the CTF flag, which players need to capture.
+
+    Security and Execution:
+        The init: true setting indicates that an init process is used, which could be relevant for process management or signaling.
+        security_opt with seccomp=chrome.json may suggest custom security profiles, possibly hinting at Chrome browser or headless Chrome usage in the bot.
+
+    Network Configuration:
+        The ports configuration for the bot service maps the container's port 8000 to the host's port 8000, allowing network interaction with the bot.
+        The web service uses the nginx image, serving content from ./web directory on port 80 inside the container, which is mapped to port 8763 on the host.
+
+    Website and Bot Interaction:
+        Given the setup, it's likely that the challenge involves interacting with the "Rainbow Notes" web application, possibly by tricking the admin bot into revealing the flag.
+        The FLAG might not be directly accessible but could be revealed through a Server-Side Request Forgery (SSRF) attack, Local File Inclusion (LFI), or by exploiting the regular expression in URL_CHECK_REGEX.
+
+    Hypothesized Attack Vectors:
+        The bot may be designed to fetch URLs or content from the web service. An SSRF vulnerability could be exploited to make the bot retrieve the flag from a protected location.
+        The regular expression for URL checking (URL_CHECK_REGEX) may be vulnerable to bypasses, allowing an attacker to craft a URL that passes the regex but causes unintended behavior by the bot.
+
+    Solution Approach:
+        Review the ./bot source code for vulnerabilities.
+        Inspect the ./web directory for clues and potential vulnerabilities in the web application.
+        Test the bot's URL-fetching functionality to see if it can be exploited to leak the flag.
+        Attempt to bypass the URL_CHECK_REGEX to explore local files or unintended URLs.
+
+    Flag Capture:
+        Once a vulnerability is found and exploited, the ultimate goal is to make the bot reveal the flag csawctf{5af5c57dd6}.```
+
+Solution Report for CTF Challenge
+
+Challenge Overview:
+The objective was to find a flag in a Capture The Flag (CTF) challenge involving code analysis and image examination.
+
+Initial Clues:
+
+    An image named unauthorized.png.
+    A React code snippet that loads an image based on authentication.
+    A Flask routes file with various authentication endpoints and a specific route for retrieving a flag image.
+
+Step-by-Step Analysis:
+
+    Image Analysis:
+        The provided image resembles a conversation from the Metal Gear Solid game series featuring a character named Otacon.
+        The image contains a message that hints at significant upcoming events and asks the user to watch their codec.
+        There is a scrambled message at the bottom: csawctf{k3pt_y0u_w41t1ng_hUh}.
+
+    Code Snippet Examination:
+        The React component was designed to make an API call to retrieve an image based on user authentication.
+        The Flask routes file provided APIs for user registration, login, verification, and specifically getting a flag if the user is authenticated as solidsnake@protonmail.com.
+
+    Decoding the Clues:
+        The message in the image was identified as a typical CTF flag format.
+        The phrase "Kept you waiting, huh?" is a signature line associated with the character Solid Snake, hinting at the need to use this identity.
+
+    Correlating with Flask Application:
+        The /get_flag endpoint in the Flask application requires the user to be authenticated as solidsnake@protonmail.com to return the flag.
+        A successful authentication would provide an image URL which, according to the code, seems to be the actual flag.
+
+Understand the Vulnerability (Blocky Nonsense)
+
+Chat Context: https://chat.openai.com/share/78a79e67-a0e0-4afa-b72d-1133613bd217
+
+Clue: The README.md file indicates the ECDSA signature scheme's nonce is generated by a cubic congruential generator, which is a weakness since related nonces can lead to a security compromise.
+
+Step: Recognize that the nonces in the ECDSA implementation are predictable due to the use of a cubic congruential generator (CCG).
+Analyze the Code:
+
+Clue: The sig.sage (or sig_sage.py) file outlines the ECDSA implementation and the LCG's next method, which shows how nonces are generated in a predictable manner.
+
+Step: Review the ECDSA and LCG implementation to understand how the related nonces are generated.
+Collect Signatures:
+
+Clue: The blocks.sage (or blocks_sage.py) file indicates that the first block contains the flag's hash and signature.
+
+Step: Collect multiple signatures from the blockchain, especially focusing on the first block where the flag is located.
+
+Exploit the Nonce Generation:
+
+Clue: The predictability of the LCG means that after observing a sufficient number of nonces, you can predict future nonces or even retroactively deduce past nonces.
+
+Step: Use the collected signatures to deduce the state of the LCG and the nonces used for those signatures.
+Compute the Private Key:
+
+Clue: Given that related nonces are used in the signatures, and we have the ECDSA equations, we can set up a system of equations to solve for the private key.
+
+Step: Exploit the related nonces to compute the private ECDSA key.
+Find and Verify the Flag:
+
+Clue: The full flag is already known from the blocks.sage file: "csaw{ECDSA_d03s_N0t_wORK_W1th_Cubic_C0Ngr31ial_G3n3r41oRS}".
+
+
+Steps and Clues for Retrieving the Flag for Circles
+
+Chat Context: https://chat.openai.com/share/df1cc1ee-8719-44eb-ac31-df642d1673b5
+
+**Step 1: README Analysis**
+Clue: The README mentioned a numerical pattern 1, 2, 4, 8, 16, ..., suggesting a binary progression, and referenced Moser's Circles.
+Action: Recognized the pattern as powers of 2, which are fundamental in binary systems, hinting at a possible encryption key.
+
+**Step 2: Image Inspection**
+Clue: The flag.png contained a visible partial flag with a leet speak message, referencing deceptive patterns and 3Blue1Brown.
+Action: Translated the leet speak and identified the format of a typical CTF flag.
+
+**Step 3: Code Execution**
+Clue: secret.py defined a special_function that seemed to generate a sequence when applied to powers of 2.
+Action: Executed the function with a sequence of powers of 2 to see if it produced any pattern or relevant data.
+
+**Step 4: Server Script Review**
+Clue: server.py used the special_function to create an encryption key for AES from a given hexadecimal value and an IV to encrypt flag.png.
+Action: Understood the encryption process and identified the absence of the flag.enc file.
+
+**Step 5: JSON File Context**
+Clue: challenge.json reiterated the importance of the numerical pattern for deciphering the encryption key and the existence of a flag.enc file.
+Action: Correlated the information with the previous steps and recognized the missing piece.
+
+**Step 6: Flag Reconstruction**
+Clue: Combined the partial flag from the image with additional text provided during the conversation.
+
+Action: Completed the flag csawctf{p4773rn5_c4n_b3_d3c31v1n6_5h0u70u7_70_3blu31brOwn_fOr_7h3_1d34}
