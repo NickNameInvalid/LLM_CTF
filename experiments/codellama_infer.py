@@ -13,7 +13,7 @@ pipeline = transformers.pipeline(
     device_map="auto",
 )
 
-prompt = open('whataxor.txt', 'r').read()
+prompt = open('./questions/whataxor.txt', 'r').read()
 # prompt = "Write a hello world function in python.\n"
 sequences = pipeline(
     prompt,

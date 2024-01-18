@@ -1,0 +1,11 @@
+- Correct instructions, but no code -
+
+
+The given code is a simple program that takes an input string from the user and checks if its length is 12 characters. If the length is 12, it calculates the MD5 hash of a fixed string ("csawctf{") concatenated with the input string and prints the resulting hash. The fixed string is not visible in the binary code, but we can see that the MD5 hash is being calculated with a 16-byte array (`local_418`), which means that the input string is being concatenated with the fixed string before being hashed.
+
+Here's a Python script that calls the `test.out` executable with the correct input:
+
+```python
+import subprocess
+
+#

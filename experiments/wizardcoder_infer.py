@@ -4,7 +4,7 @@ from transformers import LogitsProcessor, LogitsProcessorList
 import transformers
 import torch
 
-model_name = "WizardLM/WizardCoder-Python-7B-V1.0"
+model_name = "WizardLM/WizardCoder-Python-34B-V1.0"
 
 stop_words = ["\n#", "\n```\n"]
 stop_words_ids = [[13,29937], [13,28956,13], [13,28956,30004]]
@@ -24,8 +24,7 @@ def alpaca_prompt(input):
 def main():
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(
-        "text-generation",
-        model=checkpoint,
+        model_name,
         load_in_8bit=False,
         torch_dtype=torch.float16,
         device_map="auto")
@@ -53,15 +52,16 @@ def main():
                         if self.encounters[i] <= 0:
                             scores[i] = forced_eos
             return scores
+    
+    pass_at = 1
     logits_processor = LogitsProcessorList([StopSequences(stop_words_ids, batch_size=max(pass_at,1), encounters=1)])
-
-    prompt = open('whataxor.txt', 'r').read()
+    prompt = open('./questions_open/target_practice.txt', 'r').read()
     while prompt != "":
         prompt = prompt.replace('    ', '\t')
         prompt = alpaca_prompt(prompt)
         prompt_ids = tokenizer.batch_encode_plus([prompt]*max(pass_at,1), return_tensors="pt", truncation=True, max_length=2048).to(torch.cuda.current_device())
                 
-        max_new_tokens = 256
+        max_new_tokens = 1024
         with torch.no_grad():
             answer_ids = model.generate(
                 **prompt_ids,
@@ -73,14 +73,19 @@ def main():
                 top_k = 0,
                 top_p = 0.95,
                 temperature = 0.8,
-                num_beams = 1,
-                logits_processor = logits_processor
+                num_beams = 1
+                # logits_processor = logits_processor
             )
-        answer_ids = answer_ids[:, len(prompt_ids['input_ids'][0]):]
+        answer_ids_trimmed = answer_ids[:, len(prompt_ids['input_ids'][0]):]
+        answer_text_trimmed = tokenizer.batch_decode(answer_ids_trimmed, skip_special_tokens=True)
         answer_text = tokenizer.batch_decode(answer_ids, skip_special_tokens=True)
         torch.cuda.empty_cache()
-        for answer in answer_text:
+        print(f"The trimmed answer is:\n")
+        for answer in answer_text_trimmed:
             print(f"{answer}")
+        # print(f"The original answer is:\n")
+        # for answer in answer_text:
+        #     print(f"{answer}")
         print(f"\n\nAre you satisfied with the answer? If not, Please enter new prompt:")
         prompt = input()
 
