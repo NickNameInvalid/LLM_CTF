@@ -1,0 +1,591 @@
+Below is a question in CTF, called "Br3akTh3Vau1t". Help me solve it. Give detailed steps and write a python code that solves the problem, that leads to the print of the flag. 
+I hereby provide the question description, and the related file "runme.yml", "ansible.cfg" and "vars/main.yml".
+
+Description:
+This is a medium/hard cryptographic forensics challenge. Players run an ansible vault playbook. They need to read the code and see how Red Hat's Ansible Vault manipulates data.
+The flag will be encoded with Base64 then thrown into a Circular Bit Shifter for all 3 variables.
+
+runme.yml
+# k3ma5
+# CSAW '23 Vault Cryptographic Forensics Challenge
+# Br3akTh3V@u1t
+#
+
+- hosts: localhost
+  vars_files:
+    - vars/main.yml
+
+  vars_prompt:
+    - name: csaw_vault_secret
+      prompt: Enter the Vault password
+      private: true
+  
+  tasks:
+
+    - name: Create dirs
+      file:
+        path: "/opt/{{ item }}"
+        state: directory
+        mode : 755
+        owner: root
+        group: root
+      loop: 
+        - tmp1
+        - tmp2
+        - tmp3
+        - tmp4
+        - tmp5
+        - tmp6
+        - tmp7
+        - tmp8
+        - tmp9
+        - tmp10
+        - tmp2.71828
+        - tmp1337
+        - tmp2013-12-19
+        - tmp02-06-2020
+        - tmp11-11-2011
+        - tmp02-02-1902
+    
+    - name: Create CSAW Vault
+      file:
+        path: "{{ vault_file_path }}"
+        state: touch
+        mode : 755
+        owner: root
+        group: root
+
+    - name: Add Vault Secret
+      lineinfile: 
+        state: present
+        insertafter: EOF
+        dest: "{{ vault_file_path }}"
+        line: "{{ sus1337 }}"
+      no_log: true
+
+    - name: Encrypt file "{{ vault_file }}"
+      expect:
+        command: ansible-vault encrypt "{{ vault_file_path }}"
+        responses:
+          New Vault password: "{{ vault_secret }}"
+          Confirm New Vault password: "{{ vault_secret }}"
+      no_log: true
+  
+    - name: Insert Vault Secret into Ansible Config
+      lineinfile: 
+        state: present
+        insertafter: "#vault_password_file = /path/to/vault_password_file"
+        dest: "{{ ansibleConfig_path }}"
+        line: "vault_password_file = {{ vault_file }}"
+      no_log: true
+
+ansible.cfg
+# Example config file for ansible -- https://ansible.com/
+# =======================================================
+
+# Nearly all parameters can be overridden in ansible-playbook
+# or with command line flags. Ansible will read ANSIBLE_CONFIG,
+# ansible.cfg in the current working directory, .ansible.cfg in
+# the home directory, or /etc/ansible/ansible.cfg, whichever it
+# finds first
+
+# For a full list of available options, run ansible-config list or see the
+# documentation: https://docs.ansible.com/ansible/latest/reference_appendices/config.html.
+
+[defaults]
+#inventory       = /etc/ansible/hosts
+#library         = ~/.ansible/plugins/modules:/usr/share/ansible/plugins/modules
+#module_utils    = ~/.ansible/plugins/module_utils:/usr/share/ansible/plugins/module_utils
+#remote_tmp      = ~/.ansible/tmp
+#local_tmp       = ~/.ansible/tmp
+#forks           = 5
+#poll_interval   = 0.001
+#ask_pass        = False
+#transport       = smart
+
+# Plays will gather facts by default, which contain information about
+# the remote system.
+#
+# smart - gather by default, but don't regather if already gathered
+# implicit - gather by default, turn off with gather_facts: False
+# explicit - do not gather by default, must say gather_facts: True
+#gathering = implicit
+
+# This only affects the gathering done by a play's gather_facts directive,
+# by default gathering retrieves all facts subsets
+# all - gather all subsets
+# network - gather min and network facts
+# hardware - gather hardware facts (longest facts to retrieve)
+# virtual - gather min and virtual facts
+# facter - import facts from facter
+# ohai - import facts from ohai
+# You can combine them using comma (ex: network,virtual)
+# You can negate them using ! (ex: !hardware,!facter,!ohai)
+# A minimal set of facts is always gathered.
+#
+#gather_subset = all
+
+# some hardware related facts are collected
+# with a maximum timeout of 10 seconds. This
+# option lets you increase or decrease that
+# timeout to something more suitable for the
+# environment.
+#
+#gather_timeout = 10
+
+# Ansible facts are available inside the ansible_facts.* dictionary
+# namespace. This setting maintains the behaviour which was the default prior
+# to 2.5, duplicating these variables into the main namespace, each with a
+# prefix of 'ansible_'.
+# This variable is set to True by default for backwards compatibility. It
+# will be changed to a default of 'False' in a future release.
+#
+#inject_facts_as_vars = True
+
+# Paths to search for collections, colon separated
+# collections_paths = ~/.ansible/collections:/usr/share/ansible/collections
+
+# Paths to search for roles, colon separated
+#roles_path = ~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
+
+# Host key checking is enabled by default
+#host_key_checking = True
+
+# You can only have one 'stdout' callback type enabled at a time. The default
+# is 'default'. The 'yaml' or 'debug' stdout callback plugins are easier to read.
+#
+#stdout_callback = default
+#stdout_callback = yaml
+#stdout_callback = debug
+
+
+# Ansible ships with some plugins that require whitelisting,
+# this is done to avoid running all of a type by default.
+# These setting lists those that you want enabled for your system.
+# Custom plugins should not need this unless plugin author disables them
+# by default.
+#
+# Enable callback plugins, they can output to stdout but cannot be 'stdout' type.
+#callback_whitelist = timer, mail
+
+# Determine whether includes in tasks and handlers are "static" by
+# default. As of 2.0, includes are dynamic by default. Setting these
+# values to True will make includes behave more like they did in the
+# 1.x versions.
+#
+#task_includes_static = False
+#handler_includes_static = False
+
+# Controls if a missing handler for a notification event is an error or a warning
+#error_on_missing_handler = True
+
+# Default timeout for connection plugins
+#timeout = 10
+
+# Default user to use for playbooks if user is not specified
+# Uses the connection plugin's default, normally the user currently executing Ansible,
+# unless a different user is specified here.
+#
+#remote_user = root
+
+# Logging is off by default unless this path is defined.
+#log_path = /var/log/ansible.log
+
+# Default module to use when running ad-hoc commands
+#module_name = command
+
+# Use this shell for commands executed under sudo.
+# you may need to change this to /bin/bash in rare instances
+# if sudo is constrained.
+#
+#executable = /bin/sh
+
+# By default, variables from roles will be visible in the global variable
+# scope. To prevent this, set the following option to True, and only
+# tasks and handlers within the role will see the variables there
+#
+#private_role_vars = False
+
+# List any Jinja2 extensions to enable here.
+#jinja2_extensions = jinja2.ext.do,jinja2.ext.i18n
+
+# If set, always use this private key file for authentication, same as
+# if passing --private-key to ansible or ansible-playbook
+#
+#private_key_file = /path/to/file
+
+# If set, configures the path to the Vault password file as an alternative to
+# specifying --vault-password-file on the command line. This can also be
+# an executable script that returns the vault password to stdout.
+#
+#vault_password_file = /path/to/vault_password_file
+
+# Format of string {{ ansible_managed }} available within Jinja2
+# templates indicates to users editing templates files will be replaced.
+# replacing {file}, {host} and {uid} and strftime codes with proper values.
+#
+#ansible_managed = Ansible managed: {file} modified on %Y-%m-%d %H:%M:%S by {uid} on {host}
+
+# {file}, {host}, {uid}, and the timestamp can all interfere with idempotence
+# in some situations so the default is a static string:
+#
+#ansible_managed = Ansible managed
+
+# By default, ansible-playbook will display "Skipping [host]" if it determines a task
+# should not be run on a host. Set this to "False" if you don't want to see these "Skipping"
+# messages. NOTE: the task header will still be shown regardless of whether or not the
+# task is skipped.
+#
+#display_skipped_hosts = True
+
+# By default, if a task in a playbook does not include a name: field then
+# ansible-playbook will construct a header that includes the task's action but
+# not the task's args. This is a security feature because ansible cannot know
+# if the *module* considers an argument to be no_log at the time that the
+# header is printed. If your environment doesn't have a problem securing
+# stdout from ansible-playbook (or you have manually specified no_log in your
+# playbook on all of the tasks where you have secret information) then you can
+# safely set this to True to get more informative messages.
+#
+#display_args_to_stdout = False
+
+# Ansible will raise errors when attempting to dereference
+# Jinja2 variables that are not set in templates or action lines. Uncomment this line
+# to change this behavior.
+#
+#error_on_undefined_vars = False
+
+# Ansible may display warnings based on the configuration of the
+# system running ansible itself. This may include warnings about 3rd party packages or
+# other conditions that should be resolved if possible.
+# To disable these warnings, set the following value to False:
+#
+#system_warnings = True
+
+# Ansible may display deprecation warnings for language
+# features that should no longer be used and will be removed in future versions.
+# To disable these warnings, set the following value to False:
+#
+#deprecation_warnings = True
+
+# Ansible can optionally warn when usage of the shell and
+# command module appear to be simplified by using a default Ansible module
+# instead. These warnings can be silenced by adjusting the following
+# setting or adding warn=yes or warn=no to the end of the command line
+# parameter string. This will for example suggest using the git module
+# instead of shelling out to the git command.
+#
+#command_warnings = False
+
+
+# set plugin path directories here, separate with colons
+#action_plugins     = /usr/share/ansible/plugins/action
+#become_plugins     = /usr/share/ansible/plugins/become
+#cache_plugins      = /usr/share/ansible/plugins/cache
+#callback_plugins   = /usr/share/ansible/plugins/callback
+#connection_plugins = /usr/share/ansible/plugins/connection
+#lookup_plugins     = /usr/share/ansible/plugins/lookup
+#inventory_plugins  = /usr/share/ansible/plugins/inventory
+#vars_plugins       = /usr/share/ansible/plugins/vars
+#filter_plugins     = /usr/share/ansible/plugins/filter
+#test_plugins       = /usr/share/ansible/plugins/test
+#terminal_plugins   = /usr/share/ansible/plugins/terminal
+#strategy_plugins   = /usr/share/ansible/plugins/strategy
+
+
+# Ansible will use the 'linear' strategy but you may want to try another one.
+#strategy = linear
+
+# By default, callbacks are not loaded for /bin/ansible. Enable this if you
+# want, for example, a notification or logging callback to also apply to
+# /bin/ansible runs
+#
+#bin_ansible_callbacks = False
+
+
+# Don't like cows?  that's unfortunate.
+# set to 1 if you don't want cowsay support or export ANSIBLE_NOCOWS=1
+#nocows = 1
+
+# Set which cowsay stencil you'd like to use by default. When set to 'random',
+# a random stencil will be selected for each task. The selection will be filtered
+# against the `cow_whitelist` option below.
+#
+#cow_selection = default
+#cow_selection = random
+
+# When using the 'random' option for cowsay, stencils will be restricted to this list.
+# it should be formatted as a comma-separated list with no spaces between names.
+# NOTE: line continuations here are for formatting purposes only, as the INI parser
+#       in python does not support them.
+#
+#cow_whitelist=bud-frogs,bunny,cheese,daemon,default,dragon,elephant-in-snake,elephant,eyes,\
+#              hellokitty,kitty,luke-koala,meow,milk,moofasa,moose,ren,sheep,small,stegosaurus,\
+#              stimpy,supermilker,three-eyes,turkey,turtle,tux,udder,vader-koala,vader,www
+
+# Don't like colors either?
+# set to 1 if you don't want colors, or export ANSIBLE_NOCOLOR=1
+#
+#nocolor = 1
+
+# If set to a persistent type (not 'memory', for example 'redis') fact values
+# from previous runs in Ansible will be stored. This may be useful when
+# wanting to use, for example, IP information from one group of servers
+# without having to talk to them in the same playbook run to get their
+# current IP information.
+#
+#fact_caching = memory
+
+# This option tells Ansible where to cache facts. The value is plugin dependent.
+# For the jsonfile plugin, it should be a path to a local directory.
+# For the redis plugin, the value is a host:port:database triplet: fact_caching_connection = localhost:6379:0
+#
+#fact_caching_connection=/tmp
+
+# retry files
+# When a playbook fails a .retry file can be created that will be placed in ~/
+# You can enable this feature by setting retry_files_enabled to True
+# and you can change the location of the files by setting retry_files_save_path
+#
+#retry_files_enabled = False
+#retry_files_save_path = ~/.ansible-retry
+
+# prevents logging of task data, off by default
+#no_log = False
+
+# prevents logging of tasks, but only on the targets, data is still logged on the master/controller
+#no_target_syslog = False
+
+# Controls whether Ansible will raise an error or warning if a task has no
+# choice but to create world readable temporary files to execute a module on
+# the remote machine. This option is False by default for security. Users may
+# turn this on to have behaviour more like Ansible prior to 2.1.x. See
+# https://docs.ansible.com/ansible/latest/user_guide/become.html#becoming-an-unprivileged-user
+# for more secure ways to fix this than enabling this option.
+#
+#allow_world_readable_tmpfiles = False
+
+# Controls what compression method is used for new-style ansible modules when
+# they are sent to the remote system. The compression types depend on having
+# support compiled into both the controller's python and the client's python.
+# The names should match with the python Zipfile compression types:
+# * ZIP_STORED (no compression. available everywhere)
+# * ZIP_DEFLATED (uses zlib, the default)
+# These values may be set per host via the ansible_module_compression inventory variable.
+#
+#module_compression = 'ZIP_DEFLATED'
+
+# This controls the cutoff point (in bytes) on --diff for files
+# set to 0 for unlimited (RAM may suffer!).
+#
+#max_diff_size = 104448
+
+# Controls showing custom stats at the end, off by default
+#show_custom_stats = False
+
+# Controls which files to ignore when using a directory as inventory with
+# possibly multiple sources (both static and dynamic)
+#
+#inventory_ignore_extensions = ~, .orig, .bak, .ini, .cfg, .retry, .pyc, .pyo
+
+# This family of modules use an alternative execution path optimized for network appliances
+# only update this setting if you know how this works, otherwise it can break module execution
+#
+#network_group_modules=eos, nxos, ios, iosxr, junos, vyos
+
+# When enabled, this option allows lookups (via variables like {{lookup('foo')}} or when used as
+# a loop with `with_foo`) to return data that is not marked "unsafe". This means the data may contain
+# jinja2 templating language which will be run through the templating engine.
+# ENABLING THIS COULD BE A SECURITY RISK
+#
+#allow_unsafe_lookups = False
+
+# set default errors for all plays
+#any_errors_fatal = False
+
+
+[inventory]
+# List of enabled inventory plugins and the order in which they are used.
+#enable_plugins = host_list, script, auto, yaml, ini, toml
+
+# Ignore these extensions when parsing a directory as inventory source
+#ignore_extensions = .pyc, .pyo, .swp, .bak, ~, .rpm, .md, .txt, ~, .orig, .ini, .cfg, .retry
+
+# ignore files matching these patterns when parsing a directory as inventory source
+#ignore_patterns=
+
+# If 'True' unparsed inventory sources become fatal errors, otherwise they are warnings.
+#unparsed_is_failed = False
+
+
+[privilege_escalation]
+#become = False
+#become_method = sudo
+#become_ask_pass = False
+
+
+## Connection Plugins ##
+
+# Settings for each connection plugin go under a section titled '[[plugin_name]_connection]'
+# To view available connection plugins, run ansible-doc -t connection -l
+# To view available options for a connection plugin, run ansible-doc -t connection [plugin_name]
+# https://docs.ansible.com/ansible/latest/plugins/connection.html
+
+[paramiko_connection]
+# uncomment this line to cause the paramiko connection plugin to not record new host
+# keys encountered. Increases performance on new host additions. Setting works independently of the
+# host key checking setting above.
+#record_host_keys=False
+
+# by default, Ansible requests a pseudo-terminal for commands executed under sudo. Uncomment this
+# line to disable this behaviour.
+#pty = False
+
+# paramiko will default to looking for SSH keys initially when trying to
+# authenticate to remote devices. This is a problem for some network devices
+# that close the connection after a key failure. Uncomment this line to
+# disable the Paramiko look for keys function
+#look_for_keys = False
+
+# When using persistent connections with Paramiko, the connection runs in a
+# background process. If the host doesn't already have a valid SSH key, by
+# default Ansible will prompt to add the host key. This will cause connections
+# running in background processes to fail. Uncomment this line to have
+# Paramiko automatically add host keys.
+#host_key_auto_add = True
+
+
+[ssh_connection]
+# ssh arguments to use
+# Leaving off ControlPersist will result in poor performance, so use
+# paramiko on older platforms rather than removing it, -C controls compression use
+#ssh_args = -C -o ControlMaster=auto -o ControlPersist=60s
+
+# The base directory for the ControlPath sockets.
+# This is the "%(directory)s" in the control_path option
+#
+# Example:
+# control_path_dir = /tmp/.ansible/cp
+#control_path_dir = ~/.ansible/cp
+
+# The path to use for the ControlPath sockets. This defaults to a hashed string of the hostname,
+# port and username (empty string in the config). The hash mitigates a common problem users
+# found with long hostnames and the conventional %(directory)s/ansible-ssh-%%h-%%p-%%r format.
+# In those cases, a "too long for Unix domain socket" ssh error would occur.
+#
+# Example:
+# control_path = %(directory)s/%%C
+#control_path =
+
+# Enabling pipelining reduces the number of SSH operations required to
+# execute a module on the remote server. This can result in a significant
+# performance improvement when enabled, however when using "sudo:" you must
+# first disable 'requiretty' in /etc/sudoers
+#
+# By default, this option is disabled to preserve compatibility with
+# sudoers configurations that have requiretty (the default on many distros).
+#
+#pipelining = False
+
+# Control the mechanism for transferring files (old)
+#   * smart = try sftp and then try scp [default]
+#   * True = use scp only
+#   * False = use sftp only
+#scp_if_ssh = smart
+
+# Control the mechanism for transferring files (new)
+# If set, this will override the scp_if_ssh option
+#   * sftp  = use sftp to transfer files
+#   * scp   = use scp to transfer files
+#   * piped = use 'dd' over SSH to transfer files
+#   * smart = try sftp, scp, and piped, in that order [default]
+#transfer_method = smart
+
+# If False, sftp will not use batch mode to transfer files. This may cause some
+# types of file transfer failures impossible to catch however, and should
+# only be disabled if your sftp version has problems with batch mode
+#sftp_batch_mode = False
+
+# The -tt argument is passed to ssh when pipelining is not enabled because sudo
+# requires a tty by default.
+#usetty = True
+
+# Number of times to retry an SSH connection to a host, in case of UNREACHABLE.
+# For each retry attempt, there is an exponential backoff,
+# so after the first attempt there is 1s wait, then 2s, 4s etc. up to 30s (max).
+#retries = 3
+
+
+[persistent_connection]
+# Configures the persistent connection timeout value in seconds. This value is
+# how long the persistent connection will remain idle before it is destroyed.
+# If the connection doesn't receive a request before the timeout value
+# expires, the connection is shutdown. The default value is 30 seconds.
+#connect_timeout = 30
+
+# The command timeout value defines the amount of time to wait for a command
+# or RPC call before timing out. The value for the command timeout must
+# be less than the value of the persistent connection idle timeout (connect_timeout)
+# The default value is 30 second.
+#command_timeout = 30
+
+
+## Become Plugins ##
+
+# Settings for become plugins go under a section named '[[plugin_name]_become_plugin]'
+# To view available become plugins, run ansible-doc -t become -l
+# To view available options for a specific plugin, run ansible-doc -t become [plugin_name]
+# https://docs.ansible.com/ansible/latest/plugins/become.html
+
+[sudo_become_plugin]
+#flags = -H -S -n
+#user = root
+
+
+[selinux]
+# file systems that require special treatment when dealing with security context
+# the default behaviour that copies the existing context or uses the user default
+# needs to be changed to use the file system dependent context.
+#special_context_filesystems=fuse,nfs,vboxsf,ramfs,9p,vfat
+
+# Set this to True to allow libvirt_lxc connections to work without SELinux.
+#libvirt_lxc_noseclabel = False
+
+
+[colors]
+#highlight = white
+#verbose = blue
+#warn = bright purple
+#error = red
+#debug = dark gray
+#deprecate = purple
+#skip = cyan
+#unreachable = red
+#ok = green
+#changed = yellow
+#diff_add = green
+#diff_remove = red
+#diff_lines = cyan
+
+
+[diff]
+# Always print diff when running ( same as always running with -D/--diff )
+#always = False
+
+# Set how many context lines to show in diff
+#context = 3
+
+vars/main.yml
+###################
+# Vault Vars  #
+###################
+vault_file_path: "/opt/tmp2.71828/csaw_vault.yml"
+ansibleConfig_path: "./ansible.cfg"
+vars_path: "./vars/main.yml"
+vault_secret: "password: {{ lookup('password', '/tmp/passwordfile', chars=['ascii_letters', 'digits', 'punctuation']) }}"
+#vault_secret: "w3Ar3N0tG0nN4T3llY0u_w3Ar31337"
+vault_file: "csaw_vault.yml"
+playbook_dir: "./"
+sus: "5346815611816381158830026000575759913046890410767282609674124748425112753245783703275530777684185849448083"
+sus1337: "15295865526991442899"
+sus14: "946424971685A5869533B6761685D47626D665A6A585E4A79585A4539474A5673696248626962467367465579484E4679523C6C64684B67616754376467486C694746537A575E40336D693571675D476957546C6C496241536D6C6239575E4539474C6A794745367463424A7A575E497A575E453C4962424948424971685A5864674557626756403467465979474C6A79484E467267565031674C657A597246726D65576A57493C6362343E64634243395755303948425F6A535243316749337A53524332633A437A53424032697242726D69333C434249646851576953524A7A575E497A585157626756403467465979474C6A79484E467267565031674C657A597246726D65576A57493C6362343E64634243395755303947464575675A467A584B6764674837616235367469743765584A40746D664A656352407369724031674557636749333A58594764674837636236537A575E4031685A5C62684B67636D66523A575643794749357A585E4C62674957646748376467486C69484466736D687B6C476F6B435759576468446679484248636E62507A585D47616746423A53524A7262313C69484E46736E6157626239576A57465862674C657A533D437948425F6A5754376A57564A6163424F69585D47695352447A575136736E6B67626239576467486C61685947616755303A585A48695332507262343579454658695237676367464974684B676952364579484E477A57564279474649626336503948425F6A575C6979474933326962447A575136736E6B676262395764674860736A73776167493339474E467467587B69474645756759357A535247736D66523A57553039474C6030597240526D655769523931326741576367464A736972437958546A7947464E69575C65736331576168515379474A4134634240316745576A5E6A4C6A575256726352467A59624A7367465C69523763794746523A575437626759397A535240316746457948424971685A5869533B6379474C6A79474A51326D625862675655746746437948425679474645794749377A5754376362393A6167565035645377646235576362365C616972457263315764674837636D665A74684A40795331576957553539484E477A57565A61634248646342486267477579454C6D69474138626E6B676367464974674C6C6369724A73674658616972403262346C6467486C636962407269624031674557636236447A53524D62633A41326357776A57564A6163424A695754376363324C6957537764674837695758737948425F6A5352467467486C636E6D476957553B6947464E6A533A4C6A5236403A5352403262346C6467486C63696242726D69333267465B6A52355769575A46746851576167553B61685A507A58465862684D476957553B694749303167465979484248636E62507A585D457946425F6A5352477263346C636962467A59624C6267465A64684A46726D6C6A69474E4672675131326D6C6A695852507262353A794748686369724C626D66496267465B69484E41395237676A533A46746851476363324C6A575E4F6C434248626D61576168515764623C6372634245726331576A52383769585468656352447A585A4C62684B67695D665A6958565A7A5352433A5352447167546F646342433957553039474C60394842567C476F6B45523C6579523557646235576A57465A71685A4C6948424971685A5869533B637948446C69474131336331576A57553A74685A4C6948425F695851576A57564A6163424779585A403563524032697248694842597957553A79575E403167593579474868646D6557616235367462387C6A57446C6947493572684B6762623957646748686463424331674C6A616342407369724B61685A4C69533253756352457A575E4C63633E48636E6B676A5D69397948425F6958515764684A48626E6E48695332507262343579464E40726D6E4C6947464575635240726D6A56736D613864674C667269624A69575437695D655763633246716236557947493D6C4342433A53524474685E4039474655736336597A535240316746403948446C69484A4C646D66586263424863697243716852503267455769585D476367493A73623C696267455579454C6579474136736331576952364A7A585D476367465973623935795757776167525C626E625074684B6761685D47626D693039484E4862674C6C626E61557946446F6A5754376353524774685A4A6167464A7A535248694741386A5236463167553C694746403947454763633256736D65576957553B69474868626D61576952364A7163424032697240316745576952387C636D63737948425F6A585A4C69474C6A794745367947453C6A5751576467483761623536746972433167483763535248626354376652386C6269624A4947464A716972447563524C6267465A64684A46726D6C6A694741386167577763684A46746D6C6B6A58594764674837636236557A534248626D6157636D665A6A575C623A5352447A585E4A7957546C6369777762685B6763684A46746D6C6B6A585947626D665C6A534245726331576162353674697240326972433167493479454B67695750376363324C69575470726D636762633947646238686463424A4947464479484E4865675C657A5972467369624331674640394749303167465973697248636D6557636236453167553E694842567947413C6F49724475635247736D69323167525C63696246726D68753947453C6A575157616235367469724F62633367646748376A5236503948425F6A5352447A585E4A7957546C6948425F6A585A4C694746457A53424F626333676268565A6163424A494749333A5352403167465479474C6579474A5C6A585D457946446F6A57543762685B676167525C626E625074684B6761685D47636D66523A5756437A575157695E6B676467486C694846557A57465972684C60726D63676267565A6167464571685E447947493D6948425F6A535240336D66457362364A64674C66726967776353524F69585A5C694745367948424971685A5869533B6579454B6769523645726D69303947486C636D6557636236537A575E4031685A5C62684B67636D66523A57564379474135336236537A5A63776353524474685E403947464374623645336972497A585A5C6957577762685C6A7A57587D6C476F6B4657486C636D665D62633A4C6C434247736D6C6239575E4539474C6579474645794749377A5754376362393A61675650356352497A58564131685A4C63697248626D69357567513674685D4764684A48626E6E48695332507262343763633C6A74674654736974376657553031675777626D69333C43424A69585E4F69474868636972496A5756557948425F6A535247736D6C6479585A4539484E413952376763633C6A746746547C49624242696248626D69357567513674685D4764684A48626E6E48695332507262343763633C6A7467465479474C6A794745367463424869484E4C69533A4C64634240336D66457362364A64674C667269624A75685E403A575035794546457947464572623535326759313369724A75685E403A5750376A5751377263346C636E6D476167553B61685A507A58465862684D4764674837636D66523A5756437948425F6A575C6979474C6B6A575530316852553948446F6A5754376A57465A71685A4C6A534248626D61576262353375635243316746557947425C63623C697A5751573948425F61685D4761685D476467486C6947465A73623655795235576262395763684A40746D664A6563543B434C624971685A5869533B6761675437695754376263324C6269624A72623E407A5852553947464373623837636D665874675C697A585D4769533A45336842567A533A48636748653C49624A4A59624A49484E486563524A7262313C64674860726D636379454B6764623645746342407463424F6A5756497A534246726D687539474A453948425F62633E4C69474A56736962433167493479454B67616755303A57553B69474C603C49624A4A596240316745576952393574674655746342467A5962447563524A7367465C6952376761685D4769585A5861675878695D687C694842567948425F6A53524332633A437A5347776353524F69585A5C694745367948424971685A5869533B65794642567947465579533A453368415761685D47646748376167553B61675E48646745576467486C6947425C63623C697A53524D6263394763684A40746D664A656357776957553B694842567947465579533A453368415764623C60316342433A57564279474E4975685240326234697958524F656352407369724032697240726D6250795236403A535245726331576467493679474131395237676A57465A71685A4C69474A5673696247736D6C6239575E453C49624744685A4031674659726759397A53577764674837636D66523A575643794749357A53546A79474C6B6A57553031685255394844607467476769585E4A74685A48626D6E4C6948446F6A5754376467486C6947425C6A5D66413268415761685D4769575536726E6C647168525539484A4C63685650736D665A7948425F6A53524A636E6C677467493E636D664771674C6A69484E407A523538646846597A53543B434C646C69474E48626D65367463424C6568424C695331576A5239323A585A457267565574684D4379474E46736E6246736D66403167593573697777626339476263325F6A585947626746497A52355379474A58695236537A585E4A794749397A5236457168507864674C66726E6D47646748376A533A48626E615764685D4763684A40746D664A6563524674685157626239576467486C61685947695D66557A575A50795236557952355579454C6039474C6A794842567948425F6A575C697947464B646D66457467464E6A5352403269724A73674658616972467A596241336977776957553B6948446C69484E4F626336537A53424C6568424C6953315764674868646342403167465539484460726747776363324C6957537579464256794842597563524032697247736D66523A5755303948425F6A575C6979484E477A57565A61634240736972403269724D6167546F646342486A523640726E6E403948425F6A5352497A575643716852507A585D47626239576167553D62633A44795852507262343579454C657A5D69397267564031675935794742567A585D47626D693039474071336331576462364574634240326972496A53524D636D665C6C434240746342437262353E63697240326972496A53524D636D665C6C49624A426D6A56736D613864674C667269624C65684248626D625A7948425679474A50726747776467486C6947464239575C6379575A437A53524A746749397957546C69484E4779575E4C6C49624A426D6A56736D613864674C667269624073697243546751367369646A79484C667467553E6A58594379484E40336D69357A52365979474E4674685E40726A63776357553D62633A44795852507262343761685D476A5D687C6A58525C636962467A59624D626239303C43424F69585D47626759397A53524C6567565A7C434242726D69333369724472633A4C6C434248626D61576467553B6A585A4A746746457A584D476267465A736972403167464579464A41326759397C476F6B465235576268565A7463424B6A575A5C626D6157626336597947493332696247736D6C6239575E4539474C6D6948446C694746543367465A646342403269724F69585A5C6947464575635437665235576268565A7463424A6262313C694842567A52365031674659794746457A53424A636D66586467455763633C6A746746547369724331674C6A616342486267487674697248626D69357567513674685D4764684A48626E6E48695332507262353A79484256794842586162355763674878695235557946424C626332437A53524F69585A5C69474A4C6A5754376A57465D6A57553B6167553E6948425F6A575C697947493332696247736D6C6239575E4539474A567369624A6A57553034685A407A585D4764623C603163424331674C6A73674659736977776A5746497162353C63633D4379474655746D66537263324C63697777695238767362365B6947425672633A4A7C43424A7A575E497A585157616746457A584E4F6957547C636977776957553B69474E4674685A407A585A4A7C496245516745576467465A616745367267493E6167565A7947493D6948425F6A53524779585E40394742507A5342457263315769575873726333676A5D693979484E40336D69357A597247736D6C6239575E453C434249646851576A57587C6953325972623530795972403A575E4F626D6933726234607A585D476A574835734760785A5352403167455761533C67716746597368465571633D4769585A4C6947425C6A574C6A6958525C6A5342403269724964675C637A574C657A597248626D69357567513674685D4763633C6A74674654736974376652355769585A4C6947425C6A5D66557A574C657A5972467468594763684A40746D664A656352433168525F69474E4975685240326234697958524F6563577764623C6031634248626D69357567513674685D47626756407263424D62633A4339585A4B6167553E69484E453363325C62685D4379484460746747676A574C6E616852586263424A7167546579585251336D665A7C434248626D615764623C603163424C6267465A64684A46726D6C6A69474136726D66553C476F6B41533C67716746597368465571633D4764633A40746745576952393B6A5354376652355761623536746972403167464039484E4672675656726D65576167464A79484256794844697168525C69484E467A5E625339585A4C694842567947425C6A5D66557A534247736D6C623...
