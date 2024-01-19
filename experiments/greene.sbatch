@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:a100:1
 #SBATCH --time=1:59:59
 #SBATCH --mem=50GB
-#SBATCH --job-name=7B_infer
+#SBATCH --job-name=infer
 
 module purge
 

@@ -9,7 +9,7 @@
 #SBATCH --gres=gpu:a100:2
 #SBATCH --time=0:59:59
 #SBATCH --mem=50GB
-#SBATCH --job-name=34B_wz_apps
+#SBATCH --job-name=infer
 
 module purge
 
@@ -24,4 +24,4 @@ conda activate wizard
 
 export TRANSFORMERS_CACHE="/scratch/bc3194/huggingface_cache"
 export HF_HOME="/scratch/bc3194/huggingface_cache"
-python -u codellama_infer.py
+python -u wizardcoder_infer.py

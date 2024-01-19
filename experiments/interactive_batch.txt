@@ -1,0 +1,14 @@
+
+greene:
+sbatch --time=47:59:59 --mem=20GB --gres=gpu:a100:2 --cpus-per-task=2 --wrap "sleep infinity"
+
+jubail:
+srun --pty -p nvidia -C 80g --nodes=1 --ntasks-per-node=1 --cpus-per-task=2 --gres=gpu:a100:2 \
+    --time=47:59:59 --mem=50GB --job-name=infer /bin/bash
+
+
+squeue -u $USER
+
+ssh [NODE_LIST]
+
+(In there you just run python [infer.py])
