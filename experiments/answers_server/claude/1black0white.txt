@@ -1,0 +1,28 @@
+
+Here is a Python code to solve the "1black0white" CTF question based on the provided description and qr_code.txt file:
+pythonimport numpy as np
+from PIL import Image
+import qrcode
+
+# Load numbers from qr_code.txt into a numpy array
+with open('qr_code.txt') as f:
+    nums = f.read().splitlines()
+nums = np.array([int(num) for num in nums])
+
+# Reshape into square matrix based on description hint 
+nums = nums.reshape(21, 21)
+
+# Convert numbers to black/white based on 0/1 in title  
+nums[nums % 2 == 0] = 0  # even numbers to white
+nums[nums % 2 == 1] = 1  # odd numbers to black
+
+# Convert matrix to image
+img = Image.fromarray(255*nums.astype(np.uint8))
+
+# Save image & read as QR code
+img.save('qrcode.png')  
+qr = qrcode.QRCode(version=1)
+qr.add_data(img)
+qr.make()
+print(qr.data)
+This converts the numbers from the text file into a 21x21 black & white image by treating even numbers as white (0) and odd numbers as black (1), based on clues from the title. This image is saved and then read as a QR code to extract the flag. The key steps were reshaping into a square matrix and mapping numbers to black/white pixels based on parity. Let me know if you have any other questions!

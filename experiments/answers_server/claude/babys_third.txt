@@ -1,0 +1,19 @@
+
+Here are the steps to solve this CTF challenge:
+
+Examine the decompiled C code. We can see it is prompting for a password input, and checking if the input matches "csawctf{st1ng_th30ry_a1nt_so_h4rd}". So the flag is likely this string.
+However, the binary is compiled and not human-readable. The challenge description tells us to use the strings command from binutils to extract readable strings from the binary.
+Run strings babysthird | grep csawctf to search the strings output for the flag.
+We find the flag: csawctf{st1ng_th30ry_a1nt_so_h4rd}
+
+Here is the Python code to print out the flag:
+pythonflag = "csawctf{st1ng_th30ry_a1nt_so_h4rd}"
+print(flag)
+To summarize:
+
+Examine decompiled code to find expected flag format
+Use strings command on binary to extract strings
+Search strings output to find flag
+Print flag in Python
+
+Let me know if you have any other questions!

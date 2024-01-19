@@ -1,0 +1,15 @@
+
+Here is a Python script to call the executable bin.out and print the flag:
+pythonimport subprocess
+
+process = subprocess.run(['./bin.out'], stdout=subprocess.PIPE)
+stdout = process.stdout.decode() 
+
+flag = ""
+for i in range(12):
+    if i % 2 == 0 and i != 0:
+        flag += chr(int(stdout[i]) + 48)
+
+print(flag)
+This runs the executable and captures the stdout. It then parses the stdout to extract every other character, converts from int to ascii, and concatenates to form the flag string which is printed.
+Let me know if you have any other questions!

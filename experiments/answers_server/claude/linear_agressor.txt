@@ -1,0 +1,36 @@
+
+Here are the detailed steps to solve this CTF challenge and extract the flag:
+
+Examine the chal.py code:
+
+It generates a random 30-element weight vector w
+It asks us to provide 30 inputs, which are stored in x
+It outputs w dot x + 125
+
+
+To extract w, we need to provide carefully chosen inputs x and observe the outputs. By setting up a system of linear equations, we can solve for the unknown w.
+Let's provide 30 inputs of 1. This sets up 30 equations with w[0]*1 + w[1]*1 + ... + w[29]*1 = output. We can observe all 30 outputs.
+Now we have a soluble system of equations:
+w[0] + w[1] + ... + w[29] = output1
+w[0] + w[1] + ... + w[29] = output2
+...
+By subtracting the equations pairwise and solving, we can recover each individual w[i].
+
+Here is a Python code to accomplish this:
+pythonimport numpy as np
+
+outputs = []
+for i in range(30):
+    print("1")
+    output = float(input("Your result is: "))
+    outputs.append(output)
+
+w = []
+for i in range(30):
+    w.append(outputs[0] - sum(outputs[1:i]) - sum(outputs[i+1:]))
+
+flag = ""  
+for weight in w:
+    flag += chr(int(weight))
+print(flag)
+This provides 30 inputs of 1, collects the outputs, solves for w, casts to chars, and prints the flag. Let me know if you need any clarification or have additional questions!

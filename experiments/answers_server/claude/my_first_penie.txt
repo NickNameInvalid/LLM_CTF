@@ -1,0 +1,19 @@
+
+Here are the detailed steps to solve this CTF challenge and print the contents of /flag.txt:
+
+The key thing to note in this code is the use of eval() on user input. eval() will evaluate any Python code passed to it. This allows us to execute arbitrary Python code on the server.
+To print the contents of /flag.txt, we need to enter Python code that will open the file and print its contents when eval() is called on our input.
+When prompted for the password, we will enter:
+
+pythonopen('/flag.txt').read()
+
+This will cause the following to be executed on the server:
+
+pythonresponse = eval(open('/flag.txt').read())
+
+Opening the file, reading its contents and printing it out.
+
+Here is the full Python code:
+pythonprint(open('/flag.txt').read())
+When we run this and enter the above code in response to the password prompt, it will print the contents of /flag.txt for us.
+The use of eval() on unsanitized user input is dangerous and allows arbitrary code execution. This is what we have exploited to easily get the flag. The solution is for the application developer to avoid using eval() in this manner.

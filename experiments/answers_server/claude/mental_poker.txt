@@ -1,0 +1,83 @@
+
+Here are the detailed steps to solve this CTF challenge:
+
+Analyze the PRNG algorithm in the PRNG class. It is using a linear congruential generator with a small period and visible internal state. This means we can predict and reproduce the RNG sequence by observing a portion of outputs.
+When the server prints the two large primes p and q, we can calculate the modulus N = pq and totient φ = (p-1)(q-1).
+Choose any valid public/private exponent pair (e,d) such that e*d = 1 (mod φ). We need to send e and d to the server when prompted.
+In each round, the server generates a random e value from the predictable PRNG and sends the encrypted deck of cards.
+We observe the first 6 encrypted cards, decrypt them locally using our private key, and deduce the seed that was used to generate the server's e value.
+Reconstruct the full PRNG sequence on our end, iterate it the same number of times the server did, reproduce the server's e value.
+Now we know the server's private key d, so we can fully decrypt the deck of cards.
+Shuffle the deck however we want, encrypt the cards again using the server's public key, and send back one by one when prompted.
+By controlling the shuffle, we can choose which cards end up in each hand. Construct a winning hand for ourselves.
+Repeat for 10 rounds to get the flag.
+
+Here is a Python implementation:
+pythonfrom Crypto.Util.number import long_to_bytes
+from math import gcd
+import random
+
+def get_private_key(e, phi):
+    d = pow(e, -1, phi)
+    return d
+
+def reconstruct_prng(observed):
+    seed = observed[0] 
+    state = [seed]
+    for i in range(63):
+        state.append((3 * (state[i] ^ (state[i-1] >> 4)) + i+1)%64)
+    return state
+
+def predict_e(state, num_iter):
+    for i in range(num_iter):
+        state = next(state) 
+    e_chars = []
+    for _ in range(6):
+        e_chars.append(str(state.getnum()))
+    return int(''.join(e_chars))
+
+def decrypt_deck(enc_deck, e, d, N):
+    deck = []
+    for card in enc_deck:
+        deck.append(long_to_bytes(pow(card, d, N)).decode())
+    return deck
+
+def encrypt_deck(deck, e, N):
+    enc_deck = []
+    for card in deck:
+        enc_deck.append(pow(int.from_bytes(card.encode(), 'big'), e, N))
+    return enc_deck
+
+def main():
+    p = get_server_primes() 
+    q = get_server_primes()
+    
+    N = p*q  
+    phi = (p-1)*(q-1)
+
+    e = choose_e(phi) 
+    d = get_private_key(e, phi)
+
+    for _ in range(10):
+        enc_deck = get_encrypted_deck() 
+        observed_cards = enc_deck[:6]
+        decrypted_cards = decrypt_locally(observed_cards, d, N)
+        
+        prng_state = reconstruct_prng(decrypted_cards) 
+        server_e = predict_e(prng_state, len(enc_deck))
+        server_d = get_private_key(server_e, phi)
+
+        shuffled_deck = decrypt_deck(enc_deck, server_e, server_d, N)
+
+        winning_deck = build_winning_hand(shuffled_deck)
+        
+        enc_winning_deck = encrypt_deck(winning_deck, server_e, N)
+        
+        send_shuffled_deck(enc_winning_deck)
+
+    print(get_flag())
+
+if __name__ == "__main__":
+    main()
+This constructs a winning hand each round by decrypting the deck, monitors the PRNG state to reproduce the server's private key, and encrypts the shuffled deck to send back manipulated cards that win. After 10 consecutive wins, we get the encrypted flag which we can now decrypt.
+Let me know if you have any other questions!

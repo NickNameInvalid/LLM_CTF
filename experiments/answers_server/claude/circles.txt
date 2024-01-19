@@ -1,0 +1,43 @@
+
+Here are the detailed steps to solve this CTF challenge called "circles":
+
+The description mentions Moser's circles, which is a pattern of circles with radii 1, 2, 4, 8, 16, etc. This corresponds to the special_function in the code, which generates 1, 1, 2, 4, 8, 16, etc based on the input number.
+This means the key used to encrypt the flag is derived from some number passed through the special_function. We need to reverse this function to find the original number.
+Analyzing the special_function:
+
+It outputs 1 if n < 1
+Otherwise, it outputs 1 plus some polynomial expression involving n
+By factoring, this polynomial can be written as (n^4 - 6n^3 + 23n^2 - 18*n) / 24
+
+
+To reverse it:
+
+If output is 1, input is < 1
+Otherwise:
+output - 1 = (n^4 - 6n^3 + 23n^2 - 18n) / 24
+24(output-1) = n^4 - 6n^3 + 23n^2 - 18*n
+Use this quartic equation to find n
+
+
+Implementing this in Python:
+
+pythonfrom Crypto.Cipher import AES
+
+def find_n(output):
+    if output == 1: 
+        return 0  
+    eq = 24*(output-1)   
+    # Use sympy to solve quartic equation
+    import sympy as sp
+    n = sp.solve(sp.Eq(sp.symbols('n')**4 - 6*sp.symbols('n')**3 + 23*sp.symbols('n')**2 - 18*sp.symbols('n') - eq,0))[3] 
+    return n
+
+key_n = find_n(0xcafed3adb3ef1e37)
+key = special_function(key_n).to_bytes(32,"big")
+
+# Decrypt flag  
+iv = b"r4nd0m_1v_ch053n"
+cipher = AES.new(key, AES.MODE_CBC, iv)
+flag = cipher.decrypt(open('flag.enc','rb').read())
+print(flag)
+This finds the original n that was passed to special_function, recreates the key, decrypts the flag data and prints out the flag.

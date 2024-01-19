@@ -1,0 +1,20 @@
+
+Here is a Python code to help get the correct password or flag from the given C code and binary:
+pythonpassword = []
+for char in range(0xc8, 0x83, -1):
+    password.append(chr(char))
+    
+key = 0xaa
+decoded = []
+for char in password:
+    decoded.append(chr(ord(char) ^ key))
+    
+print(''.join(decoded))
+This code does the following:
+
+Extracts the hardcoded password characters from 0xc8 to 0x83 in the C code and stores them in a list
+The password is XOR encoded, so the key 0xaa is extracted from the C code
+A decoded list is created by XORing each character with the key
+The decoded list is joined into a string and printed out to reveal the password
+
+So it decrypts the hardcoded XOR encrypted password in the C code to print out the correct password or flag that needs to be entered.

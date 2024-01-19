@@ -1,0 +1,19 @@
+
+Based on the C code, it looks like we need to enter a string that is 12 characters long (checked by the for loop with local_c) in order for the "that's correct!" message to print and the flag to be generated.
+To solve this, we can write a simple Python script that calls the executable with the correct input:
+pythonimport subprocess
+
+input_str = "A" * 12
+p = subprocess.Popen("./test.out", stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+out, err = p.communicate(input=input_str.encode())
+print(out.decode())
+This script creates a 12 character input string of all 'A's, runs the executable, and prints the output.
+The key things it's doing:
+
+Creates a 12 char input string
+Opens the executable for input/output
+Sends the input string
+Decodes and prints the output
+
+So this should call the program with the right input to print the flag.
+Let me know if you need any other help analyzing the binary or coming up with the solution script!

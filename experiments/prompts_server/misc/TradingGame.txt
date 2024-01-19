@@ -1,4 +1,4 @@
-Below is a question in CTF, called "android-dropper". Help me solve it. Give detailed steps and write a python code that solves the problem, that leads to the print of the flag. 
+Below is a question in CTF, called "TradingGame". Help me solve it. Give detailed steps and write a python code that solves the problem, that leads to the print of the flag. 
 I hereby provide the question description, and the related file "app.py", "process.py", "user.py".
 
 Description:

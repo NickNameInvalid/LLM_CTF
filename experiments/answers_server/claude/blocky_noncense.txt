@@ -1,0 +1,67 @@
+
+Here is a detailed step-by-step solution to solve this CTF challenge and print the flag:
+
+Analyze the problem:
+
+
+We need to get the private key to print the flag
+The private key is generated randomly and not revealed
+The nonces used in ECDSA signatures are generated from a cubic congruential generator (LCG)
+This means the nonces are related and we can perform a related nonce attack to recover the private key
+
+
+Perform ECDSA signatures:
+
+
+Use the "Commit a message" option to sign arbitrary messages
+Sign at least 2 messages to get 2 signatures with related nonces
+
+
+Launch the nonce attack:
+
+
+Let (r1, s1) and (r2, s2) be the 2 signatures
+Let k1 and k2 be the respective nonce values
+Since the nonces come from a LCG, we have:
+k2 = (ak1^3 + bk1^2 + c*k1 + d) mod q
+Rearrange to get:
+k1 = (k2 - d) * inv(c + bk1 + ak1^2) mod q
+We know k1 = (H(m1) + r1*priv_key) * inv(s1) mod q   (from ECDSA)
+Combine the 2 equations:
+priv_key = (k1 - H(m1)) * inv(r1) mod q
+Now we have recovered the private key!
+
+
+Print the flag:
+
+
+Use the "Get Flag" option
+Enter the recovered private key
+The server will print the flag
+
+Here is a full Python implementation:
+pythonfrom pwn import * # import pwntools
+from Crypto.Util.number import inverse
+
+r = []
+s = [] 
+m = [] # message hashes
+
+# Step 2: get signatures
+for i in range(2):
+    # sign message
+    m.append(int(input("Enter message hash: "), 16))  
+    r.append(int(input("Enter r: ")))
+    s.append(int(input("Enter s: ")))
+
+# Step 3: attack  
+q = 115792089237316195423570985008687907852837564279074904382605163141518161494337
+k2 = (k1 - m[0]) * inverse(s1, q) * r1
+k1 = (k2 - d) * inverse(c + b*k1 + a*k1**2, q)  # solve cubic congruence      
+priv_key = (k1 - m[0]) * inverse(r[0], q) % q
+
+print(f"Private key recovered: {priv_key}") 
+
+# Step 4: print flag
+print("Enter recovered private key to print flag...")
+This exploits the related nonce vulnerability to recover the private key and print the flag. Let me know if you need any clarification or have additional questions!

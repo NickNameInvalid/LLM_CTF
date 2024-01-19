@@ -1,0 +1,28 @@
+
+Here are the detailed steps to solve this CTF challenge and print the flag:
+
+Read through the babysfirst.py code and understand what it is doing. The key things to notice are:
+
+
+It is prompting the user to input a password with input("What's the password? ")
+It is checking if the input matches the string "csawctf{w3_411_star7_5om3wher3}"
+If there is a match, it prints a "Correct!" message and the flag
+If no match, it prints a hint to read the code
+
+
+So the goal is to make the input match the hard-coded flag string that is being compared against.
+The flag is: csawctf{w3_411_star7_5om3wher3}
+
+Here is python code to print the flag:
+pythonflag = "csawctf{w3_411_star7_5om3wher3}"
+print(flag)
+To actually run the babysfirst.py code yourself:
+
+Save the code in a file named babysfirst.py
+Open a terminal/command prompt
+Navigate to the directory containing babysfirst.py
+Run python3 babysfirst.py
+When prompted for the password, enter the flag string: csawctf{w3_411_star7_5om3wher3}
+
+This will print the "Correct!" message, confirming you have solved the challenge.
+Let me know if you need any clarification or have additional questions!

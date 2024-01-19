@@ -1,0 +1,28 @@
+
+Here is one way to solve this CTF challenge and print the flag:
+First, the key things we know from the description and code:
+
+The program takes a hexadecimal input and jumps to that address as code
+We need to input the address of the "cat flag" program to print the flag
+
+Since we don't have access to the actual binary, we can make some assumptions:
+
+The "cat flag" program is likely at a fixed address, e.g. 0x00400900
+The flag is likely stored in a file called "flag.txt"
+
+We can write a Python script that does the following:
+
+Launch the "target_practice" binary using subprocess
+Pass the assumed "cat flag" address 0x00400900 as a hexadecimal string input
+Capture and print the output, which should contain the flag
+
+Here is the Python code:
+pythonimport subprocess
+
+cat_flag_addr = "0x00400900"
+
+p = subprocess.run(["./target_practice"], input=cat_flag_addr, capture_output=True)
+
+print(p.stdout.decode())
+When run, this should call the "cat flag" program within the target binary, print the flag contents to stdout, which we then capture and print.
+Let me know if you would like me to explain or refine this solution further! I'm happy to provide more details or sample code.

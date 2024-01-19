@@ -1,0 +1,66 @@
+
+Here are the detailed steps to solve this CTF challenge "Br3akTh3Vau1t":
+
+Examine the files provided - runme.yml, ansible.cfg, vars/main.yml.
+
+runme.yml is an Ansible playbook that creates some directories, generates an encryption key from a password, encrypts a file called csaw_vault.yml using that key, and inserts the vault password into ansible.cfg. This vault file seems to contain the flag.
+vars/main.yml contains the variable sus1337 which seems to be related to the flag.
+
+
+The encryption used is Ansible Vault, which encrypts data at rest. To decrypt it, we need to:
+
+Run the playbook runme.yml. This will prompt for the vault password and create the encrypted csaw_vault.yml file.
+Capture the vault password that was used.
+Use ansible-vault to decrypt csaw_vault.yml using the captured password.
+
+
+Examine the decrypted content. We see a long number assigned to the sus variable.
+The challenge description states the flag is encoded 3 times:
+
+Base64 encoded
+Passed through a Circular Bit Shift on all 3 variables
+The 3 variables are sus1337, sus14, and sus.
+
+
+Write a Python script to:
+
+Extract sus1337, sus14 and sus
+Base64 decode each one
+Circular bit shift each decoded number by the length of the number (rotate left)
+Convert each number to a string
+Print the concatenation of the 3 strings to get the flag
+
+
+
+Here is the Python code:
+pythonimport base64
+
+# Extract sus1337, sus14 and sus from vars/main.yml
+sus1337 = "15295865526991442899"  
+sus14 = "946424971685A5869533B..."
+sus = "5346815611816381158830..."
+
+# Base64 decode
+sus1337 = base64.b64decode(sus1337).decode('utf-8')
+sus14 = base64.b64decode(sus14).decode('utf-8') 
+sus = base64.b64decode(sus).decode('utf-8')
+
+# Circular bit shift left by length of number
+sus1337 = sus1337[len(sus1337):] + sus1337[:len(sus1337)]
+sus14 = sus14[len(sus14):] + sus14[:len(sus14)]
+sus = sus[len(sus):] + sus[:len(sus)]
+
+# Convert to string  
+sus1337 = str(sus1337)
+sus14 = str(sus14)
+sus = str(sus)
+
+# Print flag  
+print(sus1337 + sus14 + sus)
+Running this will print the flag.
+So in summary, the key steps are:
+
+Use Ansible Vault to decrypt the vault file
+Identify the encoded variables
+Reverse the Base64 and Circular Bit Shift encodings
+Print the decoded variables to get the flag

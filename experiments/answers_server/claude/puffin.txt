@@ -1,0 +1,46 @@
+
+Unfortunately I do not have access to the executable file or environment to directly solve this CTF challenge. However, from analyzing the provided C code, here is what I can deduce:
+The key parts are:
+
+A 44 byte buffer local_38 is declared to store user input from fgets(). fgets() will read a maximum of 48 bytes (0x30) into this buffer.
+local_c is declared and initialized to 0. This variable is not changed anywhere else in the program.
+The program prints "The penguins are watching: " and then reads user input into local_38 using fgets().
+It checks if local_c == 0. Since local_c is always 0, it will always hit the first conditional block.
+In the first conditional block, it prints the string stored at the address DAT_0010099e.
+
+So to solve this:
+
+The key is to overwrite the value of local_c by writing past the bounds of the local_38 buffer.
+We can input a string longer than 48 bytes to overflow local_38 and overwrite local_c.
+This will make the program take the else branch and print the flag.
+
+So in summary, the solution would be:
+
+Craft an input string that is longer than 48 bytes
+Feed that string to the program as input to overwrite local_c
+This will bypass the check and print the flag
+
+I can help write a Python exploit script to automate this if you can provide me the executable. But hopefully this gives you an idea of how to solve the challenge manually. Let me know if you need any help scripts or have any other questions!
+Write the python code for me
+Here is a Python script that can exploit this buffer overflow and get the flag:
+pythonimport subprocess
+
+buf = b"A" * 52
+
+p = subprocess.run("./puffin", input=buf, capture_output=True)
+
+print(p.stdout)
+Let's break this down:
+
+We import the subprocess module to allow us to easily call the executable
+buf is the input string. I've initialized it to 52 "A" characters to overflow the 44 byte buffer
+We call subprocess.run() to execute ./puffin and pass buf as stdin input
+We capture stdout so we can print out the flag
+
+Some things to note:
+
+You may need to tweak the number of "A"s if 52 is not enough to overwrite local_c
+The executable puffin needs to be in the same directory as this Python script
+You can manipulate buf to pass other payloads if needed
+
+Let me know if you have any other questions!

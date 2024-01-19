@@ -1,0 +1,36 @@
+
+Here are the detailed steps to solve this CTF challenge and print the flag:
+
+Extract the base64 encoded DEX file from the decompiled Java code. It is stored in the notTheFlag byte array, which is later decoded using Base64.
+Decode this base64 string to get the actual DEX file bytes. This can be done in Python as:
+
+pythonimport base64
+
+b64_dex = "<base64 string from code>"
+dex_bytes = base64.b64decode(b64_dex)
+
+Write the decoded DEX byte array to a file, say classes.dex.
+Decompile this DEX file using a tool like jd-gui to get the Java source code.
+In the decompiled source code, look at the obf() method. This is performing a simple XOR obfuscation on the decoded data to "encrypt" the flag.
+The key used for XOR is the 3rd parameter to obf(), which is 42.
+Extract the encoded flag string, XOR each character with 42 to get the decoded flag.
+
+Here is the Python code:
+pythonimport base64
+
+b64_dex = "<base64 string from code>"
+dex_bytes = base64.b64decode(b64_dex)
+
+with open("classes.dex", "wb") as f:
+    f.write(dex_bytes)
+
+# Decompile classes.dex and inspect source code  
+
+encoded_flag = "<encoded string from obf() method>"
+
+flag = ""
+for c in encoded_flag:
+    flag += chr(ord(c) ^ 42)
+
+print(flag)
+This decrypts the string via XOR with the key and prints out the flag. Let me know if you need any other help solving this CTF challenge!
