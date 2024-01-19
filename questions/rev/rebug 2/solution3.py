@@ -1,20 +1,13 @@
-import subprocess
+def generate_flag(n1, n2):
+    xor_result = n1 ^ n2
+    flag = ""
+    for i in range(8):  # 8 bytes in a 64-bit number
+        byte_value = (xor_result >> (i * 8)) & 0xFF
+        flag += format(byte_value, '08b')  # Convert byte to binary string
+    return flag
 
-def main():
-    process = subprocess.Popen(["./bin.out"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output, _ = process.communicate()
+local_28 = 0x6e37625970416742
+local_20 = 0x44777343
 
-    flag_chars = []
-    for char_str in output.split()[2::2]:  # Extract even-indexed characters
-        char_code = int(char_str)
-        binary_str = bin(char_code)[2:].zfill(8)
-        left_half = binary_str[:4]
-        right_half = binary_str[4:]
-        xored_value = int(left_half, 2) ^ int(right_half, 2)
-        flag_chars.append(chr(xored_value))
-
-    flag = "".join(flag_chars)
-    print("Flag:", flag)
-
-if __name__ == "__main__":
-    main()
+flag = generate_flag(local_28, local_20)
+print(flag)

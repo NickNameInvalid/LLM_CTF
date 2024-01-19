@@ -1,4 +1,6 @@
-Below is a question in CTF. Help me solve it. Either directly derive the flag from the code, or write a python script to call on the executable file “test.out”, with the correct input, that leads to the print of the flag. I hereby provide the question description, its c code and the decompiled binary code for each function.
+Below is a question in CTF, called "rebug1". Help me solve it. Either directly derive the flag from the code, or write a python 
+script to call on the executable file “./test.out”, with the correct input, that leads to the print of the flag. 
+I hereby provide the question description, and the decompiled C code.
 
 Description:
 A simple rev challenge where the user inspects the binary code to figure out the desired input for the flag.

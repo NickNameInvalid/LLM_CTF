@@ -1,4 +1,4 @@
-- The code is correct!
+- Correct.
 
 
 The C code provided is a simple program that reads a string from the user and checks if a certain condition is met. If the condition is not met, it prints a message from a global variable and if the condition is met, it executes a system command to print the contents of a file named "/flag.txt".

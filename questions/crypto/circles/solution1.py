@@ -1,23 +1,36 @@
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 
-# Define the special function based on Moser's Circles pattern
 def special_function(n):
     if n < 1:
         return 1
     else:
-        return 2**(n - 1)  # Modified to reflect Moser's Circles pattern
+        return 1 + (n * (n**3 - 6 * (n**2) + 23 * n - 18) // 24)
 
-# Decrypt the flag using the inferred key and given IV
-with open('flag.enc', 'rb') as f:
-    enc = f.read()
+# Define the target pattern
+target_pattern = [1, 2, 4, 8, 16, ...]  # Replace with the actual pattern
 
-key = special_function(0xcafed3adb3ef1e37).to_bytes(32, "big")
+n = 1
+while True:
+    if special_function(n) == target_pattern[n - 1]:
+        break
+    n += 1
+
+print(f"Found n: {n}")
+
+# Calculate the key using the found 'n'
+key = special_function(0xcafed3adb3ef1e37 + n).to_bytes(32, "big")
 iv = b"r4nd0m_1v_ch053n"
+
+# Decrypt the flag
 cipher = AES.new(key, AES.MODE_CBC, iv)
-data = unpad(cipher.decrypt(enc), AES.block_size)
+with open('flag.enc', 'rb') as f:
+    enc_data = f.read()
 
-with open('flag_decrypted.png', 'wb') as f:
-    f.write(data)
+flag_data = unpad(cipher.decrypt(enc_data), AES.block_size)
 
-print("Decrypted flag saved as flag_decrypted.png")
+# Save the decrypted flag to a file
+with open('flag.png', 'wb') as f:
+    f.write(flag_data)
+
+print("Flag recovered and saved as 'flag.png'")

@@ -1,7 +1,26 @@
-Below is the C code and binary code of an executable file, ./whataxor. Please write a python code to help me get the correct password or flag.
+Below is a question in CTF, called "whataxor". Help me solve it. Either directly derive the flag from the code, or write a python 
+script to call on the executable file “./whataxor”, with the correct input, that leads to the print of the flag. 
+I hereby provide the question description, and the decompiled C code.
+
+Description:
+Reversing is hard. But, I hate to break it to you, you haven't really been reversing up to now.
+
+This program still has the flag embedded in it, but now it's obfuscated.
+
+You'll need to figure out:
+ 1. What the program is doing
+ 2. How it obfuscates the flag
+ 3. How you can recover the flag
+
+You can use `objdump` to read the raw disassembly of the file, but that's extremely complicated.
+Instead, let's use a tool that'll simply the output for us. I recommend a free decompiler, like:
+ - Dogbolt (lets you see the output of many tools at once): https://dogbolt.org/
+ - Binary Ninja Demo or Cloud (cloud lets you collab with your team members!): https://binary.ninja/demo/
+ - Ghidra (though setting up Java can be a pain): https://ghidra-sre.org/
+ - IDA Free: https://hex-rays.com/ida-free/
 
 
-
+Decompiled C code:
 undefined8 main(void)
 
 {
@@ -181,51 +200,3 @@ void xor_transform(long param_1,byte param_2)
   }
   return;
 }
-                             //
-                             // .data 
-                             // SHT_PROGBITS  [0x201000 - 0x20100f]
-                             // ram:00301000-ram:0030100f
-                             //
-                             __data_start                                    XREF[2]:     Entry Point(*), 
-                             data_start                                                   _elfSectionHeaders::000005d0(*)  
-        00301000 00              ??         00h
-        00301001 00              ??         00h
-        00301002 00              ??         00h
-        00301003 00              ??         00h
-        00301004 00              ??         00h
-        00301005 00              ??         00h
-        00301006 00              ??         00h
-        00301007 00              ??         00h
-                             __dso_handle                                    XREF[3]:     Entry Point(*), 
-                                                                                          __do_global_dtors_aux:00100777(R
-                                                                                          00301008(*)  
-        00301008 08 10 30        addr       __dso_handle                                     = 00301008
-                 00 00 00 
-                 00 00
-
-                             //
-                             // .rodata 
-                             // SHT_PROGBITS  [0xb00 - 0xb36]
-                             // ram:00100b00-ram:00100b36
-                             //
-                             _IO_stdin_used                                  XREF[2]:     Entry Point(*), 
-                                                                                          _elfSectionHeaders::00000410(*)  
-        00100b00 01 00 02 00     undefined4 00020001h
-                             s_Enter_your_password:_00100b04                 XREF[1]:     main:00100817(*)  
-        00100b04 45 6e 74        ds         "Enter your password: "
-                 65 72 20 
-                 79 6f 75 
-                             DAT_00100b1a                                    XREF[1]:     main:0010082f(*)  
-        00100b1a 25              ??         25h    %
-        00100b1b 39              ??         39h    9
-        00100b1c 39              ??         39h    9
-        00100b1d 73              ??         73h    s
-        00100b1e 00              ??         00h
-                             s_Correct!_00100b1f                             XREF[1]:     main:00100a47(*)  
-        00100b1f 43 6f 72        ds         "Correct!"
-                 72 65 63 
-                 74 21 00
-                             s_Access_denied._00100b28                       XREF[1]:     main:00100a55(*)  
-        00100b28 41 63 63        ds         "Access denied."
-                 65 73 73 
-                 20 64 65 
