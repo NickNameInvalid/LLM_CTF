@@ -1,3 +1,11 @@
+Below is a question in CTF, called "linear_regressor". Help me solve it. Give detailed steps and write a python code that solves the problem, that leads to the print of the flag. 
+I hereby provide the question description, and the related file "chal.py".
+
+Description:
+This a model extraction challenge where the player needs to extract the weights of the model in order to get the flag.
+
+chal.py:
+
 #!/usr/bin/env python3
 import numpy as np
 
