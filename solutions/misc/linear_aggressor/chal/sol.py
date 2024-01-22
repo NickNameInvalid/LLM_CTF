@@ -2,7 +2,7 @@ from pwn import *
 context.log_level= "debug"
 flag = []
 
-#p = process("./chal.py")
+p = process("./chal.py")
 p = remote("localhost", 3000)
 x = [0]*30
 for i in x:
@@ -14,7 +14,7 @@ print("b: ", b)
 for i in range(30):
     x = [0]*30
     x[i] = 1
-    #p = process("chal.py")
+    p = process("chal.py")
     p = remote("localhost", 3000)
     for i in x:
         p.sendlineafter("Enter your input: ", str(i))
