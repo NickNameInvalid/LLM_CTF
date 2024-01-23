@@ -47,6 +47,9 @@ public class Dropped {
  }
 }
 
+
+
+
 Bard: Here are the detailed steps to solve the "android-dropper" CTF challenge, along with Python code:
 
 1. Decompile the APK:

@@ -18,7 +18,7 @@ xorKey = 42
 
 line = 'For instance, on the planet Earth, man had always assumed that he was more intelligent than dolphins because he had achieved so much - the wheel, New York, wars and so on - whilst all the dolphins had ever done was muck about in the water having a good time. But conversely, the dolphins had always believed that they were far more intelligent than man - for precisely the same reasons.'
 
-with open("/home/ctf/flag.txt") as f:
+with open("/flag.txt") as f:
     flag = f.readline()
 response = line[:off1] + flag + line[off1:]
 responseCipher = bytearray()

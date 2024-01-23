@@ -1,4 +1,4 @@
-Totally wrong.
+- Totally wrong.
 
 
 To solve this problem, we need to understand that the program is performing a linear regression operation. The weights (w) are given and we need to find the input (x) that will give us the flag. The flag is the dot product of the weights and the input plus 125.
