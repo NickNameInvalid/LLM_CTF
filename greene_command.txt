@@ -1,3 +1,0 @@
-sbatch --time=47:59:59 --mem=20GB --gres=gpu:a100:2 --cpus-per-task=2 --wrap "sleep infinity"
-squeue -u $USER
-ssh [NODELIST]
