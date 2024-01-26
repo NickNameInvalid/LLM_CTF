@@ -24,4 +24,4 @@ conda activate llm_ctf
 
 export TRANSFORMERS_CACHE="/scratch/ms12416/hf_cache"
 export HF_HOME="/scratch/ms12416/hf_cache"
-python -u experiments/mixtral_infer.py
+python -u mixtral_infer.py

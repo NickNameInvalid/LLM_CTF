@@ -1,0 +1,6 @@
+Unloading module 'singularity/3.8.3'
+Unloading module 'openssl/1.1.1i'
+Unloading module 'gcc/9.2.0'
+usage: conda [-h] [--no-plugins] [-V] COMMAND ...
+conda: error: argument COMMAND: invalid choice: 'activate' (choose from 'clean', 'compare', 'config', 'create', 'info', 'init', 'install', 'list', 'notices', 'package', 'remove', 'uninstall', 'rename', 'run', 'search', 'update', 'upgrade', 'doctor', 'migrate', 'env')
+python: can't open file '/home/ms12416/projects/LLM_CTF/mixtral_infer.py': [Errno 2] No such file or directory
