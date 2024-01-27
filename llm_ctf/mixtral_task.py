@@ -2,6 +2,14 @@ import re
 import os
 from .models.mixtral import Mixtral8x7B
 
+class MixtralTask:
+    def __init__(self) -> None:
+        self.task_name=""
+    
+    def evaluate_result():
+        pass
+        
+
 def extract_python_code(text):
     pattern = r'```python\n(.*?)```'
     match = re.search(pattern, text, re.DOTALL)

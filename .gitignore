@@ -2,3 +2,4 @@ slurm/
 .history/
 keys/*
 **/__pycache__
+**/sol.py
