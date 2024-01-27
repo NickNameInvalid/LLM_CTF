@@ -1,3 +1,4 @@
 slurm/
 .history/
 keys/*
+**/__pycache__
