@@ -11,11 +11,11 @@ for d in chals/crypto/*; do
     fi
 done
 
-# # Create network
-# docker network create ctfnet
+# Create network
+docker network create ctfnet
 
-# # Download and unpack Ghidra
-# wget https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_11.0_build/ghidra_11.0_PUBLIC_20231222.zip
-# unzip ghidra_11.0_PUBLIC_20231222.zip
-# rm ghidra_11.0_PUBLIC_20231222.zip
+# Download and unpack Ghidra
+wget https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_11.0_build/ghidra_11.0_PUBLIC_20231222.zip
+unzip ghidra_11.0_PUBLIC_20231222.zip
+rm ghidra_11.0_PUBLIC_20231222.zip
 
