@@ -1,1 +1,0 @@
-timeout 900 chal.py

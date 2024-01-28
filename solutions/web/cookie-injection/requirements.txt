@@ -1,4 +1,0 @@
-flask
-pymysql
-cryptography
-gunicorn

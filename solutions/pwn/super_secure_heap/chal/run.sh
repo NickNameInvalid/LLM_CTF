@@ -1,1 +1,0 @@
-cat ./logo && timeout 120 ./super_secure_heap
