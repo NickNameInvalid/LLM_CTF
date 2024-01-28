@@ -22,44 +22,36 @@ class MixtralTask:
     
     def extract_python_code(self, text):
         pattern = r'```python\n(.*?)```'
-        match = re.search(pattern, text, re.DOTALL)
-        if match:
-            return match.group(1).strip()
+        matches = re.findall(pattern, text, re.DOTALL)
+        if matches:
+            # 返回最后一个匹配项
+            return matches[-1].strip()
         else:
             return "Python code block not found."
         
     def task_prompt(self, prompt, use_file=True):
         return self.model.generate(prompt, use_file=True)
     
-    def save_code(self, resp_text: str, save_path: str, file_name="sol.py"):
+    def save_code(self, resp_text: str, file_name="sol.py"):
         code_snpt = self.extract_python_code(resp_text)
-        with open(os.path.join(save_path, file_name), 'w') as f:
+        with open(os.path.join(self.question_path, file_name), 'w') as f:
             f.write(code_snpt)
     
     def validate_sol(self, resp: str):
         with open(os.path.join(self.question_path, 'flag.txt'), 'r') as f:
-            flag = f.read().split()
-        
+            flag = f.read()
+        print("============================== CHECKING SOLUTION ==============================")
         if flag in resp:
-            print(f"Validation succeeded with returned flag {flag}")
+            print(f"Validation succeeded with returned flag {flag} in answer")
             self.valid = True
             return self.valid
-        
-        p = subprocess.Popen('python ' + os.path.join(self.question_path, 'sol.py'), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        res = '\n'.join(p.stdout.readlines())
+        # print("============================== CHECKING FLAG IN SOLVER.PY ==============================")
+        p = subprocess.run(['python', os.path.join(self.question_path, 'sol.py')], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        res: str = str('\n' + p.stdout.decode("utf-8"))
         if flag in res:
-            print(f"Validation succeeded with returned flag {flag}")
+            print(f"Validation succeeded with returned flag {flag} by solver")
             self.valid = True
             return self.valid
 
-        print(f"Validation failed, the answer returned is: \n {res}")
+        print(f"Validation failed, the result of code execution returned is: \n {res}")
         return self.valid
-        
-
-
-
-
-
-
-
-        
