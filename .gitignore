@@ -3,3 +3,4 @@ slurm/
 keys/*
 **/__pycache__
 **/sol.py
+**/.DS_Store
