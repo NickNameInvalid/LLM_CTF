@@ -10,5 +10,6 @@
     "minimum": 50,
     "decay": 275,
     "box": "rev.chal.csaw.io",
+    "decomp_file": "bin.out",
     "files":["bin.out"]
   }

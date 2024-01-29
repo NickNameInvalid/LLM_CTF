@@ -4,3 +4,4 @@ keys/*
 **/__pycache__
 **/sol.py
 **/.DS_Store
+ghidra_11.0_PUBLIC/

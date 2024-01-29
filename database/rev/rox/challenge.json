@@ -9,6 +9,7 @@
     "initial": 500,
     "minimum": 50,
     "decay": 275,
+    "decomp_file": "./chal/food",
     "files": [
         "./chal/food"
     ],

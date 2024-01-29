@@ -5,6 +5,7 @@
   "description": "Okay time for your first real binary. (btw where is baby second???)",
   "flag": "csawctf{st1ng_th30ry_a1nt_so_h4rd}",
   "points": 50,
+  "decomp_file": "babysthird",
   "files": [
     "babysthird",
     "readme.txt"
