@@ -1,3 +1,0 @@
-
-The first time the code was wrong - it did not use ./puffin; after my feedback it became correct.
-https://g.co/bard/share/a66b9a3036eb

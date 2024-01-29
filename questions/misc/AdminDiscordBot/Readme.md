@@ -1,2 +1,0 @@
-# Admin Discord Bot
-
