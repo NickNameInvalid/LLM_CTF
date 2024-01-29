@@ -9,11 +9,12 @@ def main(question_path, prompt_path, chal_config):
     mixtral_task = mixtral.MixtralTask(question_path=question_path, 
                                        task_config=chal_config,
                                        url_path="./keys/mixtral_api.txt")
-    resp = mixtral_task.task_prompt(prompt=prompt_path, use_file=True)
+    mixtral_task.init_task()
+    # resp = mixtral_task.task_prompt(prompt=prompt_path, use_file=True)
     print("============================== RESPONSE FROM MODEL ==============================")
-    print(resp)
-    mixtral_task.save_code(resp)
-    mixtral_task.validate_sol(resp)
+    # print(resp)
+    # mixtral_task.save_code(resp)
+    # mixtral_task.validate_sol(resp)
     
 if __name__ == "__main__":
     if len(sys.argv) != 3:

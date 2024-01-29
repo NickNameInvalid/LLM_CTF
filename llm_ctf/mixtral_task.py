@@ -1,5 +1,6 @@
 import re
 import os
+import shutil
 import subprocess
 from .models.mixtral import Mixtral8x7B
 
@@ -11,20 +12,24 @@ class MixtralTask:
         self.model = self.mixtral_init(url_path)
         self.valid = False
         self.real_flag = self.config["flag"] if isinstance(self.config["flag"], str) else self.config['flag']['content']
-        self.challenge_container = self.challenge.get("container_image")
+        self.challenge_container = self.config.get("container_image", None)
         self.decomp_file = self.config.get("decomp_file", None)
         self.chal_category = self.config.get("category", "tmp")
         self.sol_path = os.path.join(os.path.splitdrive(question_path)[0], "solutions", self.chal_category, self.chal_name)
         if not os.path.exists(self.sol_path):
             os.makedirs(self.sol_path)
 
-    def _clean_sol():
+    def _clean_sol(self):
+        if os.path.exists(self.sol_path):
+            os.removedirs(self.sol_path)
         
-
-    def init_task():
+    def init_task(self):
+        self._clean_sol()
+        shutil.copytree(self.chal_path, self.sol_path)
         
     
     def decomp_program():
+        pass
         
         
     def mixtral_init(self, url_path):
