@@ -4,8 +4,8 @@ import subprocess
 from .models.mixtral import Mixtral8x7B
 
 class MixtralTask:
-    def __init__(self, question_path: str, task_name: str, url_path: str) -> None:
-        self.task_name= task_name
+    def __init__(self, question_path: str, task_config, url_path: str) -> None:
+        self.config = task_config
         self.question_path = question_path
         self.model = self.mixtral_init(url_path)
         self.valid = False
@@ -38,8 +38,7 @@ class MixtralTask:
             f.write(code_snpt)
     
     def validate_sol(self, resp: str):
-        with open(os.path.join(self.question_path, 'flag.txt'), 'r') as f:
-            flag = f.read()
+        flag = self.config["flag"]
         print("============================== CHECKING SOLUTION ==============================")
         if flag in resp:
             print(f"Validation succeeded with returned flag {flag} in answer")
