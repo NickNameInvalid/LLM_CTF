@@ -3,7 +3,7 @@
 import json
 import sys
 from pygments import highlight
-from pygments.lexers import get_lexer_for_filename
+from pygments.lexers import get_lexer_for_filename, CLexer, NasmLexer
 from pygments.formatters import TerminalFormatter
 from ctflogging import status
 
@@ -28,6 +28,24 @@ def print_run_command(args, result):
     if stderr:
         print(f"==> stderr:\n{stderr}")
 
+def print_decompile(args, result):
+    binary = args['binary']
+    function = args.get('function', 'main')
+    code = result['decompilation']
+    print(f"Decompiled {binary} function {function}:")
+    lexer = CLexer()
+    formatter = TerminalFormatter()
+    print(highlight(code, lexer, formatter))
+
+def print_disassemble(args, result):
+    binary = args['binary']
+    function = args.get('function', 'main')
+    code = result['disassembly']
+    print(f"Disassembled {binary} function {function}:")
+    lexer = NasmLexer()
+    formatter = TerminalFormatter()
+    print(highlight(code, lexer, formatter))
+
 def print_command(name, args, result):
     if args is None:
         argstr = '[missing]'
@@ -37,6 +55,10 @@ def print_command(name, args, result):
         print_run_command(args, result)
     elif name == "createfile":
         print_create_file(args, result)
+    elif name == "decompile_function":
+        print_decompile(args, result)
+    elif name == "disassemble_function":
+        print_disassemble(args, result)
     else:
         print(f"{name}({argstr}):")
         for k,v in result.items():

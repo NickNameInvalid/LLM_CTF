@@ -355,17 +355,10 @@ DISASSEMBLE_TOOL = {
         },
     },
 }
-FUNC_HEADER_REGEX = re.compile(r' +;\*+\n +;\* +(.+) +\*\n +;\*+\n')
-non_function_headings = set([
-    '(LSDA) Call Site Record',
-    '(LSDA) Type Table',
-    'Common Information Entry',
-    'END OF FRAME',
-    'Exception Handler Frame Header',
-    'Frame Description Entry Table',
-    'Frame Descriptor Entry',
-    'Language-Specific Data Area',
-])
+
+class GiveUpException(Exception):
+    pass
+
 class Disassemble(Tool):
     def __init__(self, challenge: "CTFChallenge"):
         super().__init__(DISASSEMBLE_TOOL)
@@ -416,6 +409,42 @@ class Disassemble(Tool):
                 check=False, capture_output=True,
             )
             return output.exists()
+
+class GiveUp(Tool):
+    def __init__(self, challenge: "CTFChallenge"):
+        super().__init__(GIVEUP_TOOL)
+        self.challenge = challenge
+
+    def __call__(self, confirm=None):
+        if not confirm:
+            return {"error": "You must confirm that you want to give up"}
+        raise GiveUpException()
+
+GIVEUP_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "give_up",
+        "description": "Give up on the challenge",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "confirm": {
+                    "type": "boolean",
+                    "description": "a boolean flag to confirm that you want to give up",
+                },
+            },
+            "required": ["confirm"],
+        },
+    },
+}
+
+DEFAULT_TOOLSET = [ CommandExec, CheckFlag, CreateFile, Decompile, Disassemble, GiveUp ]
+
+# Predefined sets of tools for different categories
+TOOLSETS = {
+    "crypto": [ CommandExec, CheckFlag, CreateFile, GiveUp ],
+    "default": DEFAULT_TOOLSET,
+}
 
 if __name__ == "__main__":
     import sys
