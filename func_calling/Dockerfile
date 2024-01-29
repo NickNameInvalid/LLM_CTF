@@ -45,6 +45,11 @@ RUN wget https://github.com/radareorg/radare2/releases/download/5.8.8/radare2-de
          https://github.com/radareorg/radare2/releases/download/5.8.8/radare2_5.8.8_amd64.deb && \
         apt-get install -y ./radare2-dev_5.8.8_amd64.deb ./radare2_5.8.8_amd64.deb && \
         rm -rf ./radare2-dev_5.8.8_amd64.deb ./radare2_5.8.8_amd64.deb
+
+# Sagemath
+RUN apt-get install -y sagemath
+
+# Switch to user
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
@@ -53,4 +58,4 @@ ENV VIRTUAL_ENV=/home/$USERNAME/.ctfenv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install -U pip
-RUN pip install pwntools ipython
+RUN pip install pwntools ipython gmpy2

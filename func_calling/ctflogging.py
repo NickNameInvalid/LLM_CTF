@@ -6,7 +6,7 @@ class Status:
         self.quiet = quiet
         self.debug = debug
         self._last = None
-        self.console = Console(markup=False, highlight=False)
+        self.console = Console(markup=False, highlight=False, color_system="256")
         self.debug_log = []
 
     def set(self, quiet=None, debug=None):
