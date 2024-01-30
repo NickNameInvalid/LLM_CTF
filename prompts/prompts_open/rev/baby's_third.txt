@@ -22,31 +22,3 @@ THE
 CODE
 
 (just read the important bits... 👀)
-
-Decompiled Code:
-
-undefined8 main(void)
-
-{
-  int iVar1;
-  long in_FS_OFFSET;
-  char local_78 [104];
-  long local_10;
-  
-  local_10 = *(long *)(in_FS_OFFSET + 0x28);
-  printf("Enter your password: ");
-  __isoc99_scanf(&DAT_0010201e,local_78);
-  iVar1 = strcmp(local_78,"csawctf{st1ng_th30ry_a1nt_so_h4rd}");
-  if (iVar1 == 0) {
-    puts("Correct!");
-  }
-  else {
-    puts("Access denied.");
-  }
-  if (local_10 != *(long *)(in_FS_OFFSET + 0x28)) {
-                    /* WARNING: Subroutine does not return */
-    __stack_chk_fail();
-  }
-  return 0;
-}
-

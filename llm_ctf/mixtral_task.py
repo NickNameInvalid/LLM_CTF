@@ -2,10 +2,14 @@ import re
 import os
 import shutil
 import subprocess
+import stat
+from .utils.ctflogging import Status
+from .utils.ghidra_call import Ghidra_Call
 from .models.mixtral import Mixtral8x7B
 
 class MixtralTask:
     def __init__(self, question_path: str, task_config: dict, url_path: str) -> None:
+        self.log = Status()
         self.config = task_config
         self.chal_name = self.config["name"]
         self.chal_path = os.path.abspath(question_path)
@@ -15,23 +19,28 @@ class MixtralTask:
         self.challenge_container = self.config.get("container_image", None)
         self.decomp_file = self.config.get("decomp_file", None)
         self.chal_category = self.config.get("category", "tmp")
-        self.sol_path = os.path.join(os.path.splitdrive(question_path)[0], "solutions", self.chal_category, self.chal_name)
+        self.sol_path = os.path.join("./solutions", self.chal_category, self.chal_name)
         if not os.path.exists(self.sol_path):
             os.makedirs(self.sol_path)
-
+        self.init_task()
+        if self.decomp_file:
+            self.ghidra = Ghidra_Call(self.sol_path, self.decomp_file)
+            self.decomp()
+        self.decomp_info = self.ghidra._read_dump() if self.decomp_file else ""
+        
     def _clean_sol(self):
         if os.path.exists(self.sol_path):
-            os.removedirs(self.sol_path)
+            shutil.rmtree(self.sol_path)     
+            
+    def decomp(self):
+        print(self.log.assistant_message(f"Binary file {self.decomp_file} found, do reverse engineering..."))
+        self.ghidra.run_ghidra()
         
     def init_task(self):
+        print(self.log.assistant_message("Init solution folder..."))
         self._clean_sol()
         shutil.copytree(self.chal_path, self.sol_path)
-        
-    
-    def decomp_program():
-        pass
-        
-        
+         
     def mixtral_init(self, url_path):
         with open(url_path, 'r') as f:
             url = f.read()
@@ -43,16 +52,22 @@ class MixtralTask:
         return model
     
     def extract_python_code(self, text):
+        print(self.log.assistant_message("Format solver"))
         pattern = r'```python\n(.*?)```'
         matches = re.findall(pattern, text, re.DOTALL)
         if matches:
-            # 返回最后一个匹配项
-            return matches[-1].strip()
+            return matches[0].strip()
         else:
             return "Python code block not found."
         
-    def task_prompt(self, prompt, use_file=True):
-        return self.model.generate(prompt, use_file=True)
+    def task_prompt(self, prompt, use_file=True, append_msg=""):
+        if use_file:
+            with open(prompt, 'r') as f:
+                prompt = f.read()
+        print(self.log.user_message(prompt + '\n' + append_msg))
+        resp = self.model.generate(prompt, append_msg=append_msg)
+        print(self.log.assistant_message(resp))
+        return resp
     
     def save_code(self, resp_text: str, file_name="sol.py"):
         code_snpt = self.extract_python_code(resp_text)
@@ -61,18 +76,20 @@ class MixtralTask:
     
     def validate_sol(self, resp: str):
 
-        print("============================== CHECKING SOLUTION ==============================")
+        print(self.log.assistant_message(f"Checking solution..."))
+        # print("============================== CHECKING SOLUTION ==============================")
         if self.real_flag in resp:
             print(f"Validation succeeded with returned flag {self.real_flag} in answer")
             self.valid = True
             return self.valid
         # print("============================== CHECKING FLAG IN SOLVER.PY ==============================")
-        p = subprocess.run(['python', os.path.join(self.chal_path, 'sol.py')], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        os.chdir(self.sol_path)
+        subprocess.run(['chmod', "x", self.sol_path + "/*"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
+        p = subprocess.run(['python', "sol.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
         res: str = str('\n' + p.stdout.decode("utf-8"))
         if self.real_flag in res:
             print(f"Validation succeeded with returned flag {self.real_flag} by solver")
             self.valid = True
             return self.valid
-
         print(f"Validation failed, the result of code execution returned is: \n {res}")
         return self.valid
