@@ -6,3 +6,4 @@ keys/*
 **/.DS_Store
 ghidra_11.0_PUBLIC/
 solutions/
+results.txt

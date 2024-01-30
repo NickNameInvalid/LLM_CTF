@@ -30,6 +30,7 @@ class MixtralTask:
             self.ghidra = Ghidra_Call(self.sol_path, self.decomp_file)
             self.decomp()
         self.extra_info = []
+        self.read_dir()
         
     def read_dir(self):
         for i in self.files:
@@ -39,7 +40,7 @@ class MixtralTask:
                 except Exception as e:
                     continue
         if self.decomp_file:
-            self.extra_info.append(self.ghidra._read_dump()[["decomp"]])
+            self.extra_info.append(self.ghidra._read_dump()["decomp"])
     
     def _clean_sol(self):
         if os.path.exists(self.sol_path):
@@ -82,7 +83,7 @@ class MixtralTask:
         if template_prompt:
             prompt = PROMPT_INIT.format(category=self.chal_category, category_description=category_friendly[self.chal_category], 
                                         name=self.chal_name, files=",".join(self.files), description=self.description)
-        print(self.log.user_message(prompt + '\n' + append_msg))
+        print(self.log.user_message(prompt + '\n' + "\n".join(self.extra_info) + append_msg))
         resp = self.model.generate(prompt + "\n".join(self.extra_info), append_msg=append_msg)
         print(self.log.assistant_message(resp))
         return resp

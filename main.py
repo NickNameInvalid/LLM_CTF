@@ -39,6 +39,6 @@ if __name__ == "__main__":
             success += 1
     
     with open("results.txt", "a+") as f: 
-        res = f"Challenge: {chal_name}, Success: {success}/{EXPERIMENT_REPEAT}"
+        res = f"Challenge: {chal_name}, Success: {success}/{EXPERIMENT_REPEAT}\n"
         f.write(res)
         print(res)

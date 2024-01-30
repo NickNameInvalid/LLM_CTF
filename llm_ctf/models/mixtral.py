@@ -12,6 +12,7 @@ class Mixtral8x7B(BaseModel):
         self.prompts = []
         
     def generate(self, prompt, temperature=1.0, top_p=1.0, append_msg=""):
+        # print(prompt)
         self.prompts.append({"role": "user", "content": prompt + '\n' + append_msg})
         resp = self.client.chat.completions.create(
             model=self.model_id,
