@@ -6,6 +6,7 @@ import stat
 from .utils.ctflogging import Status
 from .utils.ghidra_call import Ghidra_Call
 from .models.mixtral import Mixtral8x7B
+from .prompt import *
 
 class MixtralTask:
     def __init__(self, question_path: str, task_config: dict, url_path: str) -> None:
@@ -20,14 +21,26 @@ class MixtralTask:
         self.decomp_file = self.config.get("decomp_file", None)
         self.chal_category = self.config.get("category", "tmp")
         self.sol_path = os.path.join("./solutions", self.chal_category, self.chal_name)
+        self.files = self.config["files"]
+        self.description = self.config.get("description", "No description provided by this challenge.")
         if not os.path.exists(self.sol_path):
             os.makedirs(self.sol_path)
         self.init_task()
         if self.decomp_file:
             self.ghidra = Ghidra_Call(self.sol_path, self.decomp_file)
             self.decomp()
-        self.decomp_info = self.ghidra._read_dump() if self.decomp_file else ""
+        self.extra_info = []
         
+    def read_dir(self):
+        for i in self.files:
+            with open(os.path.join(self.sol_path, i), "r") as f:
+                try:
+                    self.extra_info.append(i + ":\n" + f.read())
+                except Exception as e:
+                    continue
+        if self.decomp_file:
+            self.extra_info.append(self.ghidra._read_dump()[["decomp"]])
+    
     def _clean_sol(self):
         if os.path.exists(self.sol_path):
             shutil.rmtree(self.sol_path)     
@@ -39,7 +52,8 @@ class MixtralTask:
     def init_task(self):
         print(self.log.assistant_message("Init solution folder..."))
         self._clean_sol()
-        shutil.copytree(self.chal_path, self.sol_path)
+        # shutil.copytree(self.chal_path, self.sol_path)
+        shutil.copytree(self.chal_path, self.sol_path, copy_function=shutil.copy2)
          
     def mixtral_init(self, url_path):
         with open(url_path, 'r') as f:
@@ -60,12 +74,16 @@ class MixtralTask:
         else:
             return "Python code block not found."
         
-    def task_prompt(self, prompt, use_file=True, append_msg=""):
+    def task_prompt(self, prompt, use_file=False, append_msg="", template_prompt=True):
         if use_file:
             with open(prompt, 'r') as f:
                 prompt = f.read()
+                
+        if template_prompt:
+            prompt = PROMPT_INIT.format(category=self.chal_category, category_description=category_friendly[self.chal_category], 
+                                        name=self.chal_name, files=",".join(self.files), description=self.description)
         print(self.log.user_message(prompt + '\n' + append_msg))
-        resp = self.model.generate(prompt, append_msg=append_msg)
+        resp = self.model.generate(prompt + "\n".join(self.extra_info), append_msg=append_msg)
         print(self.log.assistant_message(resp))
         return resp
     
@@ -84,9 +102,14 @@ class MixtralTask:
             return self.valid
         # print("============================== CHECKING FLAG IN SOLVER.PY ==============================")
         os.chdir(self.sol_path)
-        subprocess.run(['chmod', "x", self.sol_path + "/*"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
-        p = subprocess.run(['python', "sol.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
-        res: str = str('\n' + p.stdout.decode("utf-8"))
+        subprocess.run(['chmod', "777", self.sol_path + "/*"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
+        try:
+            p = subprocess.run(['python', "sol.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
+            res: str = str('\n' + p.stdout.decode("utf-8"))
+        except Exception as e:
+            print(f"Validation failed, solver cannot be executed or solver execution error")
+            return self.valid
+            
         if self.real_flag in res:
             print(f"Validation succeeded with returned flag {self.real_flag} by solver")
             self.valid = True
