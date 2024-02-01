@@ -1,5 +1,6 @@
 {
     "name": "Smug-Dino",
+    "container_image": "smug_dino",
     "category": "web",
     "author": "rollingcoconut",
     "description": "Don't you know it's wrong to smuggle dinosaurs... and other things?",
