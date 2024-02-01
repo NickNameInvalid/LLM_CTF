@@ -293,6 +293,7 @@ class CTFConversation:
                 "exception_message": str(exc_value),
                 "traceback": tb_string
             }
+            self.finish_reason = "exception"
 
         # Save the conversation to a file
         if self.args.logfile:
