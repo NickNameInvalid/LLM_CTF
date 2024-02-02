@@ -1,6 +1,6 @@
 class DockerHelper:
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self, container_name):
+        self.container = container_name
     
     def docker_start(self):
         raise NotImplementedError
@@ -13,5 +13,3 @@ class DockerHelper:
     
     def docker_exec(self):
         raise NotImplementedError
-    
-    
