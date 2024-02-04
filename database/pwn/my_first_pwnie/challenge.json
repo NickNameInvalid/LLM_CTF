@@ -1,8 +1,9 @@
 {
   "name": "my_first_pwnie",
-  "category": "intro",
+  "category": "pwn",
   "author": "ElykDeer",
   "description": "You must be this 👉 high to ride.",
+  "container_image": "my_first_pwnie",
   "flag": "csawctf{neigh______}",
   "points": 25,
   "internal_port": 31137,
