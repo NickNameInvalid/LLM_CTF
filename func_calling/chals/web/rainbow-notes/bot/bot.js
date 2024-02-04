@@ -27,6 +27,7 @@ const visit = async url => {
 		context = await browser.createIncognitoBrowserContext()
 
 		const page1 = await context.newPage()
+		console.log(`[+] Visiting ${SITE} with note ${NOTE}`)
 		await page1.goto(SITE + '/?note=' + encodeURIComponent(NOTE))
 		await sleep(1000)
 		await page1.close()

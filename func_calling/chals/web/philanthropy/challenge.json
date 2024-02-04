@@ -1,8 +1,9 @@
 {
     "name": "Philanthropy",
+    "compose": true,
     "category": "web",
     "author": "Engima",
-    "description": "Can you break into the Philanthropy website and get more information on Snake and Otacon?\n\n.\n\n`http://{box}:{port}/web/home",
+    "description": "Can you break into the Philanthropy website and get more information on Snake and Otacon?\n\n.\n\n`http://philanthropy:14180/web/home`",
     "flag": "csawctf{K3pt_y0u_Wa1t1ng_HUh}",
     "internal_port": 14180,
     "type": "dynamic",

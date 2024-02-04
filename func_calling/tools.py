@@ -93,8 +93,7 @@ class CommandExec(Tool):
                 volumes + \
                 ['--network', self.network] + \
                 ['--platform', 'linux/amd64', '-d', '--rm'] + \
-                ['--name', self.container_name, self.container_image] + \
-                ['bash', '-c', 'nohup sleep infinity'],
+                ['--name', self.container_name, self.container_image],
             check=True, capture_output=True,
         )
 

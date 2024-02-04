@@ -49,6 +49,9 @@ RUN wget https://github.com/radareorg/radare2/releases/download/5.8.8/radare2-de
 # Sagemath
 RUN apt-get install -y sagemath
 
+# sqlmap and nikto
+RUN apt-get install -y sqlmap nikto
+
 # Switch to user
 USER $USERNAME
 WORKDIR /home/$USERNAME
@@ -59,3 +62,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install -U pip
 RUN pip install pwntools ipython gmpy2
+
+# Copy in the entrypoint script
+COPY entrypoint.sh /home/$USERNAME/.entrypoint.sh
+CMD ["bash", "/home/ctfplayer/.entrypoint.sh"]
