@@ -3,9 +3,8 @@ import sys
 import os
 import json
 from pathlib import Path
-import subprocess
 
-EXPERIMENT_REPEAT = 1
+EXPERIMENT_REPEAT = 10
 DEFAULT_PATH = Path(__file__).parent.resolve()
 
 def main(question_path, prompt_path, chal_config):
