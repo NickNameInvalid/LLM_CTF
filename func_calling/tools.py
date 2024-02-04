@@ -442,6 +442,8 @@ DEFAULT_TOOLSET = [ CommandExec, CheckFlag, CreateFile, Decompile, Disassemble, 
 # Predefined sets of tools for different categories
 TOOLSETS = {
     "crypto": [ CommandExec, CheckFlag, CreateFile, GiveUp ],
+    # No binaries in the misc category
+    "misc": [ CommandExec, CheckFlag, CreateFile, GiveUp ],
     "default": DEFAULT_TOOLSET,
 }
 

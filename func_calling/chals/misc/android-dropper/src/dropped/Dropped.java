@@ -15,7 +15,7 @@ public class Dropped {
     public static String getFlag() throws IOException {
 
         String dataFromServer = "";
-        URL url = new URL("http://android-dropper.csaw.io:3003"); // replace
+        URL url = new URL("http://androiddropper:3003"); // replace
         HttpURLConnection urlConnection = (HttpURLConnection) (url).openConnection();
         try {
             urlConnection.connect();
