@@ -2,6 +2,7 @@
     "name": "Super Secure Heap",
     "description": "The most secure heap you've ever seen!",
     "category": "pwn",
+    "container_image": "super_secure_heap",
     "requirements": { },
     "type":"dynamic",
     "state":"visible",

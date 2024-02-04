@@ -2,6 +2,7 @@
     "name": "unlimited_subway",
     "description": "Imagine being able to ride the subway for free, forever.",
     "category": "pwn",
+    "container_image": "unlimited_subway",
     "requirements": { },
     "type":"dynamic",
     "state":"visible",

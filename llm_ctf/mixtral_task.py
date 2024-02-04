@@ -5,6 +5,7 @@ import subprocess
 import stat
 from .utils.ctflogging import Status
 from .utils.ghidra_call import Ghidra_Call
+from .utils.dockertool import DockerHelper
 from .models.mixtral import Mixtral8x7B
 from .prompt import *
 
@@ -31,6 +32,9 @@ class MixtralTask:
             self.decomp()
         self.extra_info = []
         self.read_dir()
+        self.docker_container = self.config.get("container_image", None)
+        self.player_docker = "ctfenv"
+        self.docker_tool = DockerHelper(self.player_docker)
         
     def read_dir(self):
         for i in self.files:
@@ -102,10 +106,11 @@ class MixtralTask:
             self.valid = True
             return self.valid
         # print("============================== CHECKING FLAG IN SOLVER.PY ==============================")
-        os.chdir(self.sol_path)
-        subprocess.run(['chmod', "777", self.sol_path + "/*"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
+        # os.chdir(self.sol_path)
+        # subprocess.run(['chmod', "777", self.sol_path + "/*"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
         try:
-            p = subprocess.run(['python', "sol.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
+            p = self.docker_tool.docker_exec("python sol.py", f"/opt/exp/solutions/{self.chal_category}/\"{self.chal_name}\"")
+            # p = subprocess.run(['python', "sol.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
             res: str = str('\n' + p.stdout.decode("utf-8"))
         except Exception as e:
             print(f"Validation failed, solver cannot be executed or solver execution error")

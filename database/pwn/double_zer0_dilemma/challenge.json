@@ -2,6 +2,7 @@
     "name": "double zer0 dilemma",
     "description": "The house always wins... or does it?",
     "category": "pwn",
+    "container_image": "double_zer0_dilemma",
     "requirements": { },
     "type":"dynamic",
     "state":"visible",

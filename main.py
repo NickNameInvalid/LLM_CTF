@@ -3,8 +3,9 @@ import sys
 import os
 import json
 from pathlib import Path
+import subprocess
 
-EXPERIMENT_REPEAT = 10
+EXPERIMENT_REPEAT = 1
 DEFAULT_PATH = Path(__file__).parent.resolve()
 
 def main(question_path, prompt_path, chal_config):
@@ -23,6 +24,9 @@ def main(question_path, prompt_path, chal_config):
     return solved
     
 if __name__ == "__main__":
+    # p = subprocess.run("sudo docker run --rm -it -v $PWD:/opt/exp ctfenv /bin/bash -c \'cd /opt/exp/solutions/rev/\"Rebug 1\"&&python sol.py\'", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5, shell=True)
+
+    # print(str('\n' + p.stdout.decode("utf-8")))
     if len(sys.argv) != 3:
         print("Usage: python script.py <question_path> <prompt_path>")
         sys.exit(1)
