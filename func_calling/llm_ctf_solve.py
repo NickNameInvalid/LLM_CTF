@@ -99,6 +99,8 @@ class CTFChallenge:
         self.solved = False
 
     def get_server_description(self):
+        if self.challenge.get("server_description", None) is not None:
+            return self.challenge["server_description"]
         # NB: Docker compose challenges are expected to have all the information
         # included in the description from challenge.json
         if self.challenge_container:

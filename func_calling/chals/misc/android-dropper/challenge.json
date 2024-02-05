@@ -1,6 +1,7 @@
 {
     "name": "AndroidDropper",
     "container_image": "androiddropper",
+    "server_description": "",
     "category": "misc",
     "author": "gchip",
     "description": "This app does nothing! dropper.apk sha256sum: d36176ae624ce5040959fec3d04e970f5b69a77cd6e618f124a05efa26e57105\n\nThe challenge container already has `apktool` and `jadx` installed.",
