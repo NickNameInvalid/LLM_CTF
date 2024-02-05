@@ -1,5 +1,8 @@
 FROM mysql:8.0-debian
 
+# MySQL repostiory key changed
+RUN gpg -k && gpg --no-default-keyring --keyring /etc/apt/keyrings/mysql.gpg --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C
+
 RUN apt-get update \
 && apt-get install python3 python3-pip -y \
 && rm -rf /var/lib/apt/lists/* \
