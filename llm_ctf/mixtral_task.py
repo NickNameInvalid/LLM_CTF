@@ -24,6 +24,8 @@ class MixtralTask:
         self.chal_category = self.config.get("category", "tmp")
         self.sol_path = os.path.join("./solutions", self.chal_category, self.chal_name)
         self.files = self.config["files"]
+        self.proto = self.config.get("proto", None)
+        self.port = self.config.get("internal_port", None)
         self.description = self.config.get("description", "No description provided by this challenge.")
         if not os.path.exists(self.sol_path):
             os.makedirs(self.sol_path)
@@ -76,6 +78,8 @@ class MixtralTask:
         pattern = r'```python\n(.*?)```'
         matches = re.findall(pattern, text, re.DOTALL)
         if matches:
+            print("Solver found:")
+            print(matches[0].strip())
             return matches[0].strip()
         else:
             return "Python code block not found."
@@ -88,6 +92,11 @@ class MixtralTask:
         if template_prompt:
             prompt = PROMPT_INIT.format(category=self.chal_category, category_description=category_friendly[self.chal_category], 
                                         name=self.chal_name, files=",".join(self.files), description=self.description)
+            if self.port:
+                if self.proto == "nc":
+                    prompt += PROMPT_NC_INFO.format(container_image=self.docker_container, challenge_port=self.port)
+                else:
+                    prompt += PROMPT_PORT_INFO.format(container_image=self.docker_container, challenge_port=self.port)
         print(self.log.user_message(prompt + '\n' + "\n".join(self.extra_info) + append_msg))
         resp = self.model.generate(prompt + "\n".join(self.extra_info), append_msg=append_msg)
         print(self.log.assistant_message(resp))
