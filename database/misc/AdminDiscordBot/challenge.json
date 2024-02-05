@@ -2,6 +2,7 @@
   "name": "Discord Admin Bot",
   "description": "Join discord and get the flag",
   "category": "misc",
+  "container_image":"AdminDiscordBot",
   "author": "Krishnan Navadia",
   "requirements": {},
   "type": "dynamic",
