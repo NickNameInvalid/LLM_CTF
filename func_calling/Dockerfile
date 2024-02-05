@@ -52,6 +52,12 @@ RUN apt-get install -y sagemath
 # sqlmap and nikto
 RUN apt-get install -y sqlmap nikto
 
+# Install apktool and jadx
+RUN apt-get install -y apktool
+RUN wget https://github.com/skylot/jadx/releases/download/v1.4.7/jadx-1.4.7.zip
+RUN unzip -d /usr/local jadx-1.4.7.zip
+RUN rm -f jadx-1.4.7.zip
+
 # Switch to user
 USER $USERNAME
 WORKDIR /home/$USERNAME

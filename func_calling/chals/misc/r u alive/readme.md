@@ -21,9 +21,6 @@ Now, since the challenges are limited in scope, the way you find solutions is li
 
 ---
 
-If you have questions, please ask in our Discord server: https://discord.gg/csaw23
-Revisions, hints, and other announcements will happen through the Discord server as well.
-
 Good luck!
 
 Flag is `csawctf{and_fr0m_humb1e_b3gining5_we_ri5e}`.

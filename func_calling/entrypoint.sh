@@ -2,4 +2,4 @@
 
 python -u -m http.server &> /tmp/ctf_web.log &
 
-nohup sleep infinity
+sleep infinity
