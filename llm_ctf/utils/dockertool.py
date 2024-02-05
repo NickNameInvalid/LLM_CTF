@@ -23,7 +23,7 @@ class DockerHelper:
             # res: str = str('\n' + p.stdout.decode("utf-8"))
             return p
         except Exception as e:
-            print(f"Validation failed, solver cannot be executed or solver execution error")
+            # print(f"Validation failed, solver cannot be executed or solver execution error")
             return None
         
         

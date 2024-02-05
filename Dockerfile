@@ -41,14 +41,14 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # Install radare2
 WORKDIR /tmp
 RUN apt-get install -y curl netcat python3-venv qemu-user qemu-user-static
-RUN wget https://github.com/radareorg/radare2/releases/download/5.8.8/radare2_5.8.8_arm64.deb && \
-        apt-get install -y ./radare2_5.8.8_arm64.deb && \
-        rm -rf ./radare2_5.8.8_arm64.deb
+# RUN wget https://github.com/radareorg/radare2/releases/download/5.8.8/radare2_5.8.8_arm64.deb && \
+#         apt-get install -y ./radare2_5.8.8_arm64.deb && \
+#         rm -rf ./radare2_5.8.8_arm64.deb
  
-# RUN wget https://github.com/radareorg/radare2/releases/download/5.8.8/radare2-dev_5.8.8_amd64.deb \
-#          https://github.com/radareorg/radare2/releases/download/5.8.8/radare2_5.8.8_amd64.deb && \
-#         apt-get install -y ./radare2-dev_5.8.8_amd64.deb ./radare2_5.8.8_amd64.deb && \
-#         rm -rf ./radare2-dev_5.8.8_amd64.deb ./radare2_5.8.8_amd64.deb
+RUN wget https://github.com/radareorg/radare2/releases/download/5.8.8/radare2-dev_5.8.8_amd64.deb \
+         https://github.com/radareorg/radare2/releases/download/5.8.8/radare2_5.8.8_amd64.deb && \
+        apt-get install -y ./radare2-dev_5.8.8_amd64.deb ./radare2_5.8.8_amd64.deb && \
+        rm -rf ./radare2-dev_5.8.8_amd64.deb ./radare2_5.8.8_amd64.deb
 # Sagemath
 RUN apt-get install -y sagemath
 
@@ -61,4 +61,4 @@ ENV VIRTUAL_ENV=/home/$USERNAME/.ctfenv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install -U pip
-RUN pip install pwntools ipython gmpy2
+RUN pip install pwntools ipython gmpy2 pycrypto sagemath

@@ -8,6 +8,7 @@ from .utils.ghidra_call import Ghidra_Call
 from .utils.dockertool import DockerHelper
 from .models.mixtral import Mixtral8x7B
 from .prompt import *
+import logging
 
 class MixtralTask:
     def __init__(self, question_path: str, task_config: dict, url_path: str) -> None:
@@ -113,7 +114,8 @@ class MixtralTask:
             # p = subprocess.run(['python', "sol.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
             res: str = str('\n' + p.stdout.decode("utf-8"))
         except Exception as e:
-            print(f"Validation failed, solver cannot be executed or solver execution error")
+            print(f"Validation failed, solver cannot be executed or solver execution error, message shown below:")
+            print(e)
             return self.valid
             
         if self.real_flag in res:

@@ -26,20 +26,23 @@ if __name__ == "__main__":
     # p = subprocess.run("sudo docker run --rm -it -v $PWD:/opt/exp ctfenv /bin/bash -c \'cd /opt/exp/solutions/rev/\"Rebug 1\"&&python sol.py\'", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5, shell=True)
 
     # print(str('\n' + p.stdout.decode("utf-8")))
-    if len(sys.argv) != 3:
-        print("Usage: python script.py <question_path> <prompt_path>")
-        sys.exit(1)
+    # if len(sys.argv) != 3:
+    #     print("Usage: python script.py <question_path> <prompt_path>")
+    #     sys.exit(1)
         
     question_path = str(sys.argv[1])
-    prompt_path = str(sys.argv[2])
+    prompt_path = str(sys.argv[2]) if len(sys.argv) > 2 else ""
     with open(os.path.join(question_path, "challenge.json"), 'r') as f:
         chal_json = json.load(f)
         
     success = 0
     chal_name = chal_json["name"]
     for i in range(EXPERIMENT_REPEAT):
-        if main(question_path, prompt_path, chal_json):
-            success += 1
+        try:
+            if main(question_path, prompt_path, chal_json):
+                success += 1
+        except Exception as e:
+            print(e)
     
     with open("results.txt", "a+") as f: 
         res = f"Challenge: {chal_name}, Success: {success}/{EXPERIMENT_REPEAT}\n"
