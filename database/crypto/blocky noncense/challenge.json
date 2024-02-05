@@ -10,5 +10,5 @@
   "minimum": 50,
   "decay": 275,
   "box": "crypto.chal.csaw.io",
-  "files":["dist.zip"]
+  "files":["./dist/blocks.sage", "./dist/blocks_sage.py", "./dist/chall.sage", "./dist/sig.sage", "./dist/sig_sage.py"]
 }

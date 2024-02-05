@@ -10,11 +10,12 @@
     "decay":275,
     "minimum":50,
     "internal_port":9999,
+    "decomp_file": "./share/chal/double_zer0_dilemma",
     "box": "pwn.chal.csaw.io",
     "flag": {
       "content": "csawctf{d0n't_g@mbl3__juST_pwn_!!}",
       "type": "dynamic",
       "path": "/home/ctf/flag"
     },
-    "files":["share.zip"]
+    "files":[]
 }

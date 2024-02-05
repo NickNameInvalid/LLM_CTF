@@ -8,7 +8,7 @@
   "points": 50,
   "internal_port": 31138,
   "box": "pwn.chal.csaw.io",
+  "decomp_files": "target_practice",
   "files": [
-    "target_practice"
   ]
 }

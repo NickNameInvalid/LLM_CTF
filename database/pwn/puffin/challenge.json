@@ -8,8 +8,8 @@
   "points": 75,
   "internal_port": 31140,
   "box": "pwn.chal.csaw.io",
+  "decomp_files": "puffin",
   "files": [
-    "puffin",
     "readme.txt"
   ]
 }

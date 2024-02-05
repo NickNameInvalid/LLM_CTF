@@ -16,5 +16,6 @@
       "type": "dynamic",
       "path": "/home/ctf/flag"
     },
-    "files":["share.zip"]
+    "decomp_files": "./share/super_secure_heap",
+    "files":[]
 }

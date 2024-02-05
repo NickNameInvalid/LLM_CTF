@@ -8,10 +8,13 @@
         "type": "static"
     },
     "type": "static",
+    "container_image": "linear_aggressor",
     "initial": 500,
     "minimum": 50,
     "decay": 275,
-    "files": [],
     "box": "127.0.0.1",
-    "internal_port":3000
+    "internal_port":3000,
+    "files": [
+        "./chal/chal.py"
+    ]
 }

@@ -7,6 +7,7 @@
     "type":"dynamic",
     "state":"visible",
     "initial":500,
+    "container_image": "stonk",
     "decay":20,
     "minimum":50,
     "internal_port":4657,

@@ -16,5 +16,6 @@
       "type": "dynamic",
       "path": "/home/ctf/flag"
     },
-    "files":["share.zip"]
+    "decomp_files": "./chal/unlimited_subway",
+    "files":[]
 }
