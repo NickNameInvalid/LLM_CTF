@@ -74,12 +74,31 @@ def print_command(name, args, result):
         for k,v in result.items():
             print(f"==> {k}:\n{v}")
 
+pretty_finish_reasons = {
+    "exception": "an exception was raised",
+    "max_rounds": "the maximum number of rounds was reached",
+    "user_cancel": "the user cancelled the conversation",
+    "give_up": "the assistant gave up",
+    "solved": "the problem was solved",
+    "unknown": "of an unknown reason"
+}
+
 calls = {}
 js = json.load(open(sys.argv[1]))
 model = js['args']['model']
 print(f"Log of conversation with {model} on {js['start_time']} to {js['end_time']} ({js['runtime_seconds']} seconds)")
 solve_str = "solved successfully" if js['solved'] else "not solved"
 print(f"Conversation lasted {js['rounds']} rounds and was {solve_str}")
+if 'finish_reason' in js:
+    print(f"Conversation ended because {pretty_finish_reasons[js['finish_reason']]}.")
+if 'exception_info' in js and js['exception_info']:
+    print()
+    print("Conversation ended with exception:")
+    print("Traceback (most recent call last):")
+    print(f"{js['exception_info']['traceback']}")
+    status.console.print(f"[red bold]{js['exception_info']['exception_type']}[/red bold]: {js['exception_info']['exception_message']}",
+                            markup=True)
+    print()
 print("*"*80)
 for message in js['messages']:
     if message['content']:
